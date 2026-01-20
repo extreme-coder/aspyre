@@ -95,7 +95,11 @@ export default function JournalComposeScreen({ navigation }) {
   const [nextStep, setNextStep] = useState('');
   const [feedbackMode, setFeedbackMode] = useState('open');
   const [feedbackQuestion, setFeedbackQuestion] = useState('');
-  const [postPrivacy, setPostPrivacy] = useState('everyone');
+  // Default post privacy based on account privacy (public account = everyone, friends account = friends)
+  const getDefaultPrivacy = useCallback(() => {
+    return profile?.account_privacy === 'public' ? 'everyone' : 'friends';
+  }, [profile?.account_privacy]);
+  const [postPrivacy, setPostPrivacy] = useState('friends');
 
   // UI state
   const [showGoalPicker, setShowGoalPicker] = useState(false);
@@ -113,6 +117,13 @@ export default function JournalComposeScreen({ navigation }) {
 
   const loading = journalLoading || goalsLoading;
 
+  // Set default privacy when profile loads (before initialization)
+  useEffect(() => {
+    if (profile && !initialized && !todayJournal) {
+      setPostPrivacy(getDefaultPrivacy());
+    }
+  }, [profile, initialized, todayJournal, getDefaultPrivacy]);
+
   // Load form data from todayJournal
   const loadFormFromJournal = useCallback(async () => {
     if (!todayJournal) return;
@@ -126,7 +137,7 @@ export default function JournalComposeScreen({ navigation }) {
     setNextStep(todayJournal.next_step || '');
     setFeedbackMode(todayJournal.feedback_mode || 'open');
     setFeedbackQuestion(todayJournal.feedback_question || '');
-    setPostPrivacy(todayJournal.post_privacy || 'everyone');
+    setPostPrivacy(todayJournal.post_privacy || getDefaultPrivacy());
 
     // Fetch bullets and chips
     const loadedBullets = await fetchBullets(todayJournal.id);
@@ -154,7 +165,7 @@ export default function JournalComposeScreen({ navigation }) {
       setProofChips([{ id: 'chip_1', type: 'minutes', value: '', label: 'min' }]);
       nextChipId.current = 2;
     }
-  }, [todayJournal, fetchBullets, fetchProofChips]);
+  }, [todayJournal, fetchBullets, fetchProofChips, getDefaultPrivacy]);
 
   // Enter edit mode and reload form data
   const enterEditMode = useCallback(async () => {
@@ -178,7 +189,7 @@ export default function JournalComposeScreen({ navigation }) {
         setNextStep(todayJournal.next_step || '');
         setFeedbackMode(todayJournal.feedback_mode || 'open');
         setFeedbackQuestion(todayJournal.feedback_question || '');
-        setPostPrivacy(todayJournal.post_privacy || 'everyone');
+        setPostPrivacy(todayJournal.post_privacy || getDefaultPrivacy());
 
         // Fetch bullets and chips
         const loadedBullets = await fetchBullets(todayJournal.id);
@@ -234,7 +245,10 @@ export default function JournalComposeScreen({ navigation }) {
           setNextStep(savedDraft.nextStep || '');
           setFeedbackMode(savedDraft.feedbackMode || 'open');
           setFeedbackQuestion(savedDraft.feedbackQuestion || '');
-          setPostPrivacy(savedDraft.postPrivacy || 'everyone');
+          setPostPrivacy(savedDraft.postPrivacy || getDefaultPrivacy());
+        } else {
+          // No draft, set default privacy based on account
+          setPostPrivacy(getDefaultPrivacy());
         }
       }
 
@@ -242,7 +256,7 @@ export default function JournalComposeScreen({ navigation }) {
     };
 
     initializeForm();
-  }, [loading, todayJournal, initialized, loadDraft, fetchBullets, fetchProofChips]);
+  }, [loading, todayJournal, initialized, loadDraft, fetchBullets, fetchProofChips, getDefaultPrivacy]);
 
   // Autosave draft
   const draftData = {
