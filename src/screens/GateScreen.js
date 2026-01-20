@@ -16,11 +16,13 @@ import { useProfile } from '../hooks/useProfile';
 import { useGateState, GateState } from '../hooks/useGateState';
 import { useFeed, FeedFilter } from '../hooks/useFeed';
 import { useGoals } from '../hooks/useGoals';
+import { useImpressions } from '../hooks/useImpressions';
 import FeedCard from '../components/FeedCard';
 import ReportModal from '../components/ReportModal';
 
 const FILTER_OPTIONS = [
-  { key: FeedFilter.SIMILAR_GOALS, label: 'Similar Goals' },
+  { key: FeedFilter.DISCOVER, label: 'Discover' },
+  { key: FeedFilter.SIMILAR_GOALS, label: 'Goals' },
   { key: FeedFilter.FRIENDS, label: 'Friends' },
   { key: FeedFilter.NEARBY, label: 'Nearby' },
   { key: FeedFilter.SAVED, label: 'Saved' },
@@ -57,6 +59,8 @@ export default function GateScreen({ navigation }) {
   } = useFeed(user?.id);
 
   const { goals, loading: goalsLoading } = useGoals(user?.id);
+
+  const { recordImpression, clearSessionTracking } = useImpressions(user?.id);
 
   const [refreshing, setRefreshing] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
@@ -105,9 +109,10 @@ export default function GateScreen({ navigation }) {
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     refreshState();
+    clearSessionTracking(); // Clear impression tracking on refresh
     await refreshFeed();
     setRefreshing(false);
-  }, [refreshState, refreshFeed]);
+  }, [refreshState, refreshFeed, clearSessionTracking]);
 
   // Handle filter change
   const handleFilterChange = useCallback((newFilter) => {
@@ -167,19 +172,26 @@ export default function GateScreen({ navigation }) {
     navigation.navigate('UserProfile', { userId: authorId });
   }, [navigation]);
 
-  // Render feed card
-  const renderItem = useCallback(({ item }) => (
-    <FeedCard
-      journal={item}
-      userId={user?.id}
-      onKudosUpdate={updateKudos}
-      onSavedUpdate={updateSaved}
-      onHide={removeFromFeed}
-      onReport={handleReport}
-      onPress={handlePostPress}
-      onAuthorPress={handleAuthorPress}
-    />
-  ), [user?.id, updateKudos, updateSaved, removeFromFeed, handleReport, handlePostPress, handleAuthorPress]);
+  // Render feed card with impression tracking
+  const renderItem = useCallback(({ item }) => {
+    // Record impression when post is rendered (visible)
+    if (filter === FeedFilter.DISCOVER) {
+      recordImpression(item.id, item.user_id);
+    }
+
+    return (
+      <FeedCard
+        journal={item}
+        userId={user?.id}
+        onKudosUpdate={updateKudos}
+        onSavedUpdate={updateSaved}
+        onHide={removeFromFeed}
+        onReport={handleReport}
+        onPress={handlePostPress}
+        onAuthorPress={handleAuthorPress}
+      />
+    );
+  }, [user?.id, updateKudos, updateSaved, removeFromFeed, handleReport, handlePostPress, handleAuthorPress, filter, recordImpression]);
 
   // Render footer
   const renderFooter = () => {
@@ -199,6 +211,10 @@ export default function GateScreen({ navigation }) {
     let subtitle = '';
 
     switch (filter) {
+      case FeedFilter.DISCOVER:
+        message = 'Nothing to discover yet';
+        subtitle = 'Check back soon as more people post';
+        break;
       case FeedFilter.FRIENDS:
         message = 'No posts from friends yet';
         subtitle = 'Add friends to see their posts here';
