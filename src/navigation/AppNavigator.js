@@ -23,6 +23,7 @@ import PostDetailScreen from '../screens/PostDetailScreen';
 import FriendsScreen from '../screens/FriendsScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
 import MyJournalDetailScreen from '../screens/MyJournalDetailScreen';
+import JournalEditorScreen from '../screens/JournalEditorScreen';
 import SavedScreen from '../screens/SavedScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 
@@ -246,6 +247,11 @@ function AppStack() {
       <Stack.Screen
         name="MyJournalDetail"
         component={MyJournalDetailScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="JournalEditor"
+        component={JournalEditorScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen

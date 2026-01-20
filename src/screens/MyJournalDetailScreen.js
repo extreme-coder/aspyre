@@ -139,7 +139,7 @@ export default function MyJournalDetailScreen({ route, navigation }) {
                   Alert.alert(
                     'Journal Deleted',
                     "Today's journal has been deleted. You'll need to post again to unlock the feed.",
-                    [{ text: 'OK', onPress: () => navigation.navigate('Home') }]
+                    [{ text: 'OK', onPress: () => navigation.navigate('MainTabs', { screen: 'Home' }) }]
                   );
                 } else {
                   Alert.alert('Deleted', 'Journal has been deleted.', [
@@ -159,10 +159,10 @@ export default function MyJournalDetailScreen({ route, navigation }) {
     );
   };
 
-  // Edit journal - navigate to compose screen
+  // Edit journal - navigate to editor screen
   const handleEdit = () => {
-    // Navigate to the compose screen which will load today's journal for editing
-    navigation.navigate('Post');
+    // Navigate to the dedicated journal editor with this journal's data
+    navigation.navigate('JournalEditor', { journal });
   };
 
   // Get image URL
