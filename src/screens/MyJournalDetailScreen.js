@@ -203,7 +203,7 @@ export default function MyJournalDetailScreen({ route, navigation }) {
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         {/* Hero Image */}
-        {imageUrl && (
+        {imageUrl && typeof imageUrl === 'string' && imageUrl.length > 0 && (
           <Image source={{ uri: imageUrl }} style={styles.heroImage} />
         )}
 

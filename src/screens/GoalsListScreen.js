@@ -12,6 +12,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useGoals } from '../hooks/useGoals';
+import HeaderProfileButton from '../components/HeaderProfileButton';
 
 const GOAL_TYPE_LABELS = {
   habit: 'Habit',
@@ -117,10 +118,11 @@ export default function GoalsListScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Goals</Text>
-        <TouchableOpacity onPress={handleCreateGoal}>
+        <TouchableOpacity style={styles.addButtonContainer} onPress={handleCreateGoal}>
           <Text style={styles.addButton}>+ New</Text>
         </TouchableOpacity>
+        <Text style={styles.title}>Goals</Text>
+        <HeaderProfileButton />
       </View>
 
       {/* Toggle Active/Archived */}
@@ -228,11 +230,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   title: {
-    fontSize: 16,
-    fontWeight: '300',
-    letterSpacing: 4,
+    fontSize: 14,
+    fontWeight: '500',
+    letterSpacing: 1,
     color: '#000',
-    textTransform: 'uppercase',
+  },
+  addButtonContainer: {
+    minWidth: 50,
   },
   addButton: {
     fontSize: 14,

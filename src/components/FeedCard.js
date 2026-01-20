@@ -222,7 +222,7 @@ export default function FeedCard({
       activeOpacity={onPress ? 0.9 : 1}
     >
       {/* Hero Image */}
-      {imageUrl && (
+      {imageUrl && typeof imageUrl === 'string' && imageUrl.length > 0 && (
         <Image source={{ uri: imageUrl }} style={styles.heroImage} />
       )}
 
@@ -243,7 +243,7 @@ export default function FeedCard({
             activeOpacity={onAuthorPress ? 0.7 : 1}
             disabled={!onAuthorPress}
           >
-            {author_avatar_url ? (
+            {author_avatar_url && typeof author_avatar_url === 'string' && author_avatar_url.length > 0 ? (
               <Image source={{ uri: author_avatar_url }} style={styles.avatar} />
             ) : (
               <View style={styles.avatarPlaceholder}>

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { supabase } from '../config/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import HeaderProfileButton from '../components/HeaderProfileButton';
 
 const GOAL_TYPE_LABELS = {
   habit: 'Habit',
@@ -215,12 +216,12 @@ export default function PostDetailScreen({ route, navigation }) {
           <Text style={styles.backButton}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Post</Text>
-        <View style={styles.placeholder} />
+        <HeaderProfileButton />
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         {/* Hero Image */}
-        {imageUrl && (
+        {imageUrl && typeof imageUrl === 'string' && imageUrl.length > 0 && (
           <Image source={{ uri: imageUrl }} style={styles.heroImage} />
         )}
 
@@ -236,7 +237,7 @@ export default function PostDetailScreen({ route, navigation }) {
             onPress={() => journal?.user_id && navigation.navigate('UserProfile', { userId: journal.user_id })}
             activeOpacity={0.7}
           >
-            {journal?.author_avatar_url ? (
+            {journal?.author_avatar_url && typeof journal.author_avatar_url === 'string' && journal.author_avatar_url.length > 0 ? (
               <Image source={{ uri: journal.author_avatar_url }} style={styles.avatar} />
             ) : (
               <View style={styles.avatarPlaceholder}>

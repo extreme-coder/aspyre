@@ -18,6 +18,7 @@ import { useProfile } from '../hooks/useProfile';
 import { useFriends } from '../hooks/useFriends';
 import { useBlocks } from '../hooks/useBlocks';
 import { useUnsavedChanges } from '../contexts/UnsavedChangesContext';
+import HeaderProfileButton from '../components/HeaderProfileButton';
 
 export default function SettingsScreen({ navigation }) {
   const { user, signOut } = useAuth();
@@ -261,7 +262,9 @@ export default function SettingsScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        <View style={styles.placeholder} />
         <Text style={styles.title}>Settings</Text>
+        <HeaderProfileButton />
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
@@ -541,17 +544,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 24,
     paddingVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
+  placeholder: {
+    minWidth: 50,
+  },
   title: {
-    fontSize: 16,
-    fontWeight: '300',
-    letterSpacing: 4,
+    fontSize: 14,
+    fontWeight: '500',
+    letterSpacing: 1,
     color: '#000',
-    textTransform: 'uppercase',
   },
   scrollView: {
     flex: 1,

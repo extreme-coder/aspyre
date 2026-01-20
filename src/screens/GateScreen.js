@@ -9,6 +9,7 @@ import {
   FlatList,
   RefreshControl,
   Alert,
+  Image,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
@@ -326,6 +327,12 @@ export default function GateScreen({ navigation }) {
           <View style={styles.secondaryActions}>
             <TouchableOpacity
               style={styles.linkButton}
+              onPress={() => navigation.navigate('Profile')}
+            >
+              <Text style={styles.linkButtonText}>View Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.linkButton}
               onPress={() => navigation.navigate('Goals')}
             >
               <Text style={styles.linkButtonText}>View Goals</Text>
@@ -354,7 +361,23 @@ export default function GateScreen({ navigation }) {
           </Text>
           <Text style={styles.timerLabel}>remaining</Text>
         </View>
-        <View style={styles.placeholder} />
+        <TouchableOpacity
+          style={styles.profileButton}
+          onPress={() => navigation.navigate('Profile')}
+        >
+          {profile?.avatar_url && typeof profile.avatar_url === 'string' && profile.avatar_url.length > 0 ? (
+            <Image
+              source={{ uri: profile.avatar_url }}
+              style={styles.profilePic}
+            />
+          ) : (
+            <View style={styles.profilePicPlaceholder}>
+              <Text style={styles.profilePicInitial}>
+                {profile?.display_name?.charAt(0)?.toUpperCase() || '?'}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
 
       {/* Filter Chips */}
@@ -580,8 +603,27 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginTop: 2,
   },
-  placeholder: {
+  profileButton: {
     width: 80,
+    alignItems: 'flex-end',
+  },
+  profilePic: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+  },
+  profilePicPlaceholder: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profilePicInitial: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666',
   },
   filterContainer: {
     borderBottomWidth: 1,

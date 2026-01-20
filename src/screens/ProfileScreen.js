@@ -139,7 +139,7 @@ export default function ProfileScreen({ navigation }) {
     <View style={styles.profileHeader}>
       {/* Avatar */}
       <View style={styles.avatarContainer}>
-        {profile?.avatar_url ? (
+        {profile?.avatar_url && typeof profile.avatar_url === 'string' && profile.avatar_url.length > 0 ? (
           <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
         ) : (
           <View style={styles.avatarPlaceholder}>
@@ -235,7 +235,7 @@ export default function ProfileScreen({ navigation }) {
       onPress={() => navigateToJournalDetail(journal)}
     >
       <View style={styles.journalItemLeft}>
-        {journal.media && (
+        {journal.media && typeof journal.media === 'string' && journal.media.length > 0 && (
           <Image source={{ uri: journal.media }} style={styles.journalThumb} />
         )}
         <View style={styles.journalInfo}>
@@ -317,7 +317,7 @@ export default function ProfileScreen({ navigation }) {
       onPress={() => navigateToSavedDetail(journal)}
     >
       <View style={styles.savedItemLeft}>
-        {journal.media && (
+        {journal.media && typeof journal.media === 'string' && journal.media.length > 0 && (
           <Image source={{ uri: journal.media }} style={styles.journalThumb} />
         )}
         <View style={styles.journalInfo}>

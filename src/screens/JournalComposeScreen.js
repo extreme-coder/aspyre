@@ -20,6 +20,7 @@ import { useJournal } from '../hooks/useJournal';
 import { useGoals } from '../hooks/useGoals';
 import { useProfile } from '../hooks/useProfile';
 import { formatDateForDisplay } from '../utils/dateUtils';
+import HeaderProfileButton from '../components/HeaderProfileButton';
 
 const PRIVACY_OPTIONS = [
   { value: 'everyone', label: 'Everyone' },
@@ -591,7 +592,7 @@ export default function JournalComposeScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <View style={styles.placeholder} />
+          <HeaderProfileButton />
           <View style={styles.headerCenter}>
             <Text style={styles.title}>Your Post</Text>
             <Text style={styles.dateText}>{formatDateForDisplay(localDate)}</Text>
@@ -610,7 +611,7 @@ export default function JournalComposeScreen({ navigation }) {
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.previewContent}>
           <View style={styles.previewCard}>
             {/* Hero image */}
-            {todayJournal?.media && (
+            {todayJournal?.media && typeof todayJournal.media === 'string' && todayJournal.media.length > 0 && (
               <Image source={{ uri: todayJournal.media }} style={styles.previewHeroImage} />
             )}
 
@@ -710,6 +711,13 @@ export default function JournalComposeScreen({ navigation }) {
 
           <TouchableOpacity style={styles.previewEditButton} onPress={enterEditMode}>
             <Text style={styles.previewEditButtonText}>Edit Post</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.viewAllPostsButton}
+            onPress={() => navigation.navigate('Profile')}
+          >
+            <Text style={styles.viewAllPostsButtonText}>View All Your Posts</Text>
           </TouchableOpacity>
 
           <View style={styles.previewExplainer}>
@@ -839,7 +847,7 @@ export default function JournalComposeScreen({ navigation }) {
 
           {/* Hero Image Picker */}
           <TouchableOpacity style={styles.imagePicker} onPress={showImageOptions}>
-            {mediaUri ? (
+            {mediaUri && typeof mediaUri === 'string' && mediaUri.length > 0 ? (
               <Image source={{ uri: mediaUri }} style={styles.heroImage} />
             ) : (
               <View style={styles.imagePickerPlaceholder}>
@@ -1625,6 +1633,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     color: '#fff',
+    letterSpacing: 1,
+  },
+  viewAllPostsButton: {
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#000',
+    paddingVertical: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  viewAllPostsButtonText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#000',
     letterSpacing: 1,
   },
   previewExplainer: {

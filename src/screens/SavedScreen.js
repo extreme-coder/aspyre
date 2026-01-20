@@ -14,6 +14,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useSavedJournals } from '../hooks/useSavedJournals';
+import HeaderProfileButton from '../components/HeaderProfileButton';
 
 /**
  * Dedicated Saved screen for viewing saved posts.
@@ -98,7 +99,7 @@ export default function SavedScreen({ navigation }) {
       activeOpacity={0.7}
     >
       {/* Thumbnail */}
-      {journal.media ? (
+      {journal.media && typeof journal.media === 'string' && journal.media.length > 0 ? (
         <Image source={{ uri: journal.media }} style={styles.thumbnail} />
       ) : (
         <View style={styles.thumbnailPlaceholder}>
@@ -172,7 +173,7 @@ export default function SavedScreen({ navigation }) {
           <Text style={styles.backButton}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Saved</Text>
-        <View style={styles.placeholder} />
+        <HeaderProfileButton />
       </View>
 
       <ScrollView
