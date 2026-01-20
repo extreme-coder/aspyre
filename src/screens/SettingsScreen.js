@@ -292,6 +292,13 @@ export default function SettingsScreen({ navigation }) {
             <Text style={styles.label}>Timezone</Text>
             <Text style={styles.value}>{profile?.timezone || getDeviceTimezone()}</Text>
           </View>
+
+          <TouchableOpacity
+            style={styles.editProfileButton}
+            onPress={() => navigation.navigate('EditProfile')}
+          >
+            <Text style={styles.editProfileButtonText}>Edit Profile</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Privacy Section */}
@@ -608,6 +615,19 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: '#999',
     marginTop: 4,
+  },
+  editProfileButton: {
+    borderWidth: 1,
+    borderColor: '#000',
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  editProfileButtonText: {
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: 1,
+    color: '#000',
   },
   input: {
     borderBottomWidth: 1,

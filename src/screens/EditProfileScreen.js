@@ -11,7 +11,9 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../hooks/useProfile';
 
@@ -20,19 +22,17 @@ import { useProfile } from '../hooks/useProfile';
  */
 export default function EditProfileScreen({ navigation }) {
   const { user } = useAuth();
-  const { profile, loading: profileLoading, updateProfile, fetchProfile } = useProfile(user?.id);
+  const { profile, loading: profileLoading, updateProfile, uploadAvatar, fetchProfile } = useProfile(user?.id);
 
   const [displayName, setDisplayName] = useState('');
-  const [handle, setHandle] = useState('');
-  const [bio, setBio] = useState('');
+  const [pendingAvatarUri, setPendingAvatarUri] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const justSavedRef = useRef(false);
 
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.display_name || '');
-      setHandle(profile.handle || '');
-      setBio(profile.bio || '');
     }
   }, [profile]);
 
@@ -42,10 +42,9 @@ export default function EditProfileScreen({ navigation }) {
     if (!profile) return false;
     return (
       displayName !== (profile.display_name || '') ||
-      handle !== (profile.handle || '') ||
-      bio !== (profile.bio || '')
+      pendingAvatarUri !== null
     );
-  }, [profile, displayName, handle, bio]);
+  }, [profile, displayName, pendingAvatarUri]);
 
   // Warn user if they try to leave with unsaved changes
   useEffect(() => {
@@ -71,6 +70,30 @@ export default function EditProfileScreen({ navigation }) {
     return unsubscribe;
   }, [navigation, hasUnsavedChanges, saving]);
 
+  const pickAvatar = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Please allow access to your photo library to change your avatar.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets?.[0]?.uri) {
+        setPendingAvatarUri(result.assets[0].uri);
+      }
+    } catch (err) {
+      console.error('Image picker error:', err);
+      Alert.alert('Error', 'Failed to select image');
+    }
+  };
+
   const handleSave = async () => {
     if (!displayName.trim()) {
       Alert.alert('Required', 'Display name is required');
@@ -79,10 +102,21 @@ export default function EditProfileScreen({ navigation }) {
 
     setSaving(true);
 
+    // Upload avatar if there's a pending one
+    if (pendingAvatarUri) {
+      setUploadingAvatar(true);
+      const avatarResult = await uploadAvatar(pendingAvatarUri);
+      setUploadingAvatar(false);
+
+      if (avatarResult.error) {
+        setSaving(false);
+        Alert.alert('Error', avatarResult.error.message || 'Failed to upload avatar');
+        return;
+      }
+    }
+
     const updates = {
       display_name: displayName.trim(),
-      handle: handle.trim() || null,
-      bio: bio.trim() || null,
     };
 
     const result = await updateProfile(updates);
@@ -90,13 +124,10 @@ export default function EditProfileScreen({ navigation }) {
     setSaving(false);
 
     if (result.error) {
-      if (result.error.message?.includes('duplicate') || result.error.code === '23505') {
-        Alert.alert('Handle Taken', 'This handle is already in use. Please choose another.');
-      } else {
-        Alert.alert('Error', result.error.message || 'Failed to update profile');
-      }
+      Alert.alert('Error', result.error.message || 'Failed to update profile');
     } else {
       justSavedRef.current = true;
+      setPendingAvatarUri(null);
       Alert.alert('Saved', 'Your profile has been updated.', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
@@ -145,16 +176,36 @@ export default function EditProfileScreen({ navigation }) {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Avatar preview */}
+          {/* Avatar */}
           <View style={styles.avatarSection}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {(displayName || profile?.handle || '?')[0].toUpperCase()}
+            <TouchableOpacity onPress={pickAvatar} disabled={saving}>
+              {pendingAvatarUri ? (
+                <Image source={{ uri: pendingAvatarUri }} style={styles.avatarImage} />
+              ) : profile?.avatar_url && typeof profile.avatar_url === 'string' && profile.avatar_url.length > 0 ? (
+                <Image source={{ uri: profile.avatar_url }} style={styles.avatarImage} />
+              ) : (
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>
+                    {(displayName || '?')[0].toUpperCase()}
+                  </Text>
+                </View>
+              )}
+              {uploadingAvatar && (
+                <View style={styles.avatarOverlay}>
+                  <ActivityIndicator color="#fff" />
+                </View>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity onPress={pickAvatar} disabled={saving}>
+              <Text style={styles.changeAvatarText}>
+                {profile?.avatar_url || pendingAvatarUri ? 'Change Photo' : 'Add Photo'}
               </Text>
-            </View>
-            <Text style={styles.avatarHint}>
-              Avatar customization coming soon
-            </Text>
+            </TouchableOpacity>
+            {pendingAvatarUri && (
+              <TouchableOpacity onPress={() => setPendingAvatarUri(null)}>
+                <Text style={styles.removeAvatarText}>Remove</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Display Name */}
@@ -172,43 +223,6 @@ export default function EditProfileScreen({ navigation }) {
             <Text style={styles.hint}>This is how you appear to others</Text>
           </View>
 
-          {/* Handle */}
-          <View style={styles.field}>
-            <Text style={styles.label}>Handle</Text>
-            <View style={styles.handleInputWrapper}>
-              <Text style={styles.handlePrefix}>@</Text>
-              <TextInput
-                style={styles.handleInput}
-                value={handle}
-                onChangeText={(text) => setHandle(text.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                placeholder="yourhandle"
-                placeholderTextColor="#999"
-                maxLength={20}
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!saving}
-              />
-            </View>
-            <Text style={styles.hint}>Letters, numbers, and underscores only</Text>
-          </View>
-
-          {/* Bio */}
-          <View style={styles.field}>
-            <Text style={styles.label}>Bio</Text>
-            <TextInput
-              style={styles.bioInput}
-              value={bio}
-              onChangeText={setBio}
-              placeholder="A short bio about yourself..."
-              placeholderTextColor="#999"
-              maxLength={160}
-              multiline
-              numberOfLines={3}
-              editable={!saving}
-            />
-            <Text style={styles.charCount}>{bio.length}/160</Text>
-          </View>
-
           {/* Email (read-only) */}
           <View style={styles.field}>
             <Text style={styles.label}>Email</Text>
@@ -221,7 +235,7 @@ export default function EditProfileScreen({ navigation }) {
             <Text style={styles.noteText}>
               For privacy and location settings, go to Settings.
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+            <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Settings' })}>
               <Text style={styles.noteLink}>Open Settings</Text>
             </TouchableOpacity>
           </View>
@@ -286,22 +300,45 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
+  avatarImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 12,
+  },
   avatarText: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: '300',
     color: '#fff',
   },
-  avatarHint: {
+  avatarOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 12,
+    borderRadius: 50,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  changeAvatarText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#000',
+    marginBottom: 8,
+  },
+  removeAvatarText: {
     fontSize: 12,
-    fontWeight: '300',
+    fontWeight: '400',
     color: '#999',
   },
   field: {
@@ -323,48 +360,11 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: '#000',
   },
-  handleInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#eee',
-  },
-  handlePrefix: {
-    fontSize: 16,
-    fontWeight: '300',
-    color: '#999',
-    paddingLeft: 14,
-  },
-  handleInput: {
-    flex: 1,
-    padding: 14,
-    paddingLeft: 4,
-    fontSize: 16,
-    fontWeight: '300',
-    color: '#000',
-  },
-  bioInput: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 14,
-    fontSize: 16,
-    fontWeight: '300',
-    color: '#000',
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
   hint: {
     fontSize: 11,
     fontWeight: '300',
     color: '#999',
     marginTop: 6,
-  },
-  charCount: {
-    fontSize: 10,
-    fontWeight: '300',
-    color: '#ccc',
-    textAlign: 'right',
-    marginTop: 4,
   },
   readOnlyValue: {
     fontSize: 16,

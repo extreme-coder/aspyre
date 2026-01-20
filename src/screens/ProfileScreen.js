@@ -94,7 +94,7 @@ export default function ProfileScreen({ navigation }) {
                 Alert.alert(
                   'Journal Deleted',
                   "Today's journal has been deleted. You'll need to post again to unlock the feed.",
-                  [{ text: 'OK', onPress: () => navigation.navigate('Home') }]
+                  [{ text: 'OK', onPress: () => navigation.navigate('MainTabs', { screen: 'Home' }) }]
                 );
               }
             }
@@ -280,7 +280,7 @@ export default function ProfileScreen({ navigation }) {
           </Text>
           <TouchableOpacity
             style={styles.ctaButton}
-            onPress={() => navigation.navigate('Post')}
+            onPress={() => navigation.navigate('MainTabs', { screen: 'Post' })}
           >
             <Text style={styles.ctaButtonText}>Write Today's Journal</Text>
           </TouchableOpacity>
@@ -370,7 +370,7 @@ export default function ProfileScreen({ navigation }) {
     <TouchableOpacity
       key={goal.id}
       style={styles.goalItem}
-      onPress={() => navigation.navigate('Goals', { screen: 'GoalEditor', params: { goal } })}
+      onPress={() => navigation.navigate('MainTabs', { screen: 'Goals', params: { screen: 'GoalEditor', params: { goal } } })}
     >
       <View style={styles.goalInfo}>
         <Text style={styles.goalTitle}>{goal.title}</Text>
@@ -398,7 +398,7 @@ export default function ProfileScreen({ navigation }) {
           </Text>
           <TouchableOpacity
             style={styles.ctaButton}
-            onPress={() => navigation.navigate('Goals')}
+            onPress={() => navigation.navigate('MainTabs', { screen: 'Goals' })}
           >
             <Text style={styles.ctaButtonText}>Create a Goal</Text>
           </TouchableOpacity>
@@ -411,7 +411,7 @@ export default function ProfileScreen({ navigation }) {
         {activeGoals.map(renderGoalItem)}
         <TouchableOpacity
           style={styles.viewAllGoalsButton}
-          onPress={() => navigation.navigate('Goals')}
+          onPress={() => navigation.navigate('MainTabs', { screen: 'Goals' })}
         >
           <Text style={styles.viewAllGoalsText}>View All Goals</Text>
         </TouchableOpacity>
@@ -493,7 +493,7 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.backButton}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Profile</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+        <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Settings' })}>
           <Text style={styles.settingsButton}>Settings</Text>
         </TouchableOpacity>
       </View>
