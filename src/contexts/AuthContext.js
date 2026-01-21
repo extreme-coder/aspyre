@@ -1,5 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { supabase } from '../config/supabase';
+import {
+  registerForPushNotificationsAsync,
+  savePushToken,
+  removePushToken,
+} from '../utils/pushNotifications';
 
 const AuthContext = createContext({});
 
@@ -11,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const previousUserIdRef = useRef(null);
 
   const fetchProfile = async (userId) => {
     setProfileError(null);
@@ -31,11 +37,17 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        previousUserIdRef.current = session.user.id;
+        await fetchProfile(session.user.id);
+        // Register for push notifications on app start
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          await savePushToken(session.user.id, token);
+        }
       }
       setLoading(false);
     });
@@ -43,11 +55,24 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        const previousUserId = previousUserIdRef.current;
         setSession(session);
         setUser(session?.user ?? null);
+
         if (session?.user) {
+          previousUserIdRef.current = session.user.id;
           await fetchProfile(session.user.id);
+          // Register for push notifications on login
+          const token = await registerForPushNotificationsAsync();
+          if (token) {
+            await savePushToken(session.user.id, token);
+          }
         } else {
+          // Remove push token on logout
+          if (previousUserId) {
+            await removePushToken(previousUserId);
+          }
+          previousUserIdRef.current = null;
           setProfile(null);
         }
         setLoading(false);

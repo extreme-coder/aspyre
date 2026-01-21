@@ -25,6 +25,7 @@ import MyJournalDetailScreen from '../screens/MyJournalDetailScreen';
 import JournalEditorScreen from '../screens/JournalEditorScreen';
 import SavedScreen from '../screens/SavedScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -256,6 +257,11 @@ function AppStack() {
       <Stack.Screen
         name="EditProfile"
         component={EditProfileScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
         options={{ animation: 'slide_from_right' }}
       />
     </Stack.Navigator>
