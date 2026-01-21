@@ -9,9 +9,13 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { supabase } from '../config/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useComments } from '../hooks/useComments';
 import HeaderProfileButton from '../components/HeaderProfileButton';
 
 const GOAL_TYPE_LABELS = {
@@ -35,6 +39,18 @@ export default function PostDetailScreen({ route, navigation }) {
   const [proofChips, setProofChips] = useState([]);
   const [kudosLoading, setKudosLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [newComment, setNewComment] = useState('');
+
+  // Comments
+  const {
+    comments,
+    loading: commentsLoading,
+    adding: addingComment,
+    fetchComments,
+    addComment,
+    deleteComment,
+    commentCount,
+  } = useComments(initialJournal?.id, user?.id);
 
   // Fetch full journal detail
   const fetchDetail = useCallback(async () => {
@@ -82,6 +98,61 @@ export default function PostDetailScreen({ route, navigation }) {
   useEffect(() => {
     fetchDetail();
   }, [fetchDetail]);
+
+  // Fetch comments on mount
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
+
+  // Handle adding a comment
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    const result = await addComment(newComment);
+    if (result.error) {
+      Alert.alert('Error', result.error.message || 'Failed to add comment');
+    } else {
+      setNewComment('');
+    }
+  };
+
+  // Handle deleting a comment
+  const handleDeleteComment = (commentId) => {
+    Alert.alert(
+      'Delete Comment',
+      'Are you sure you want to delete this comment?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await deleteComment(commentId);
+            if (result.error) {
+              Alert.alert('Error', result.error.message || 'Failed to delete comment');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // Format comment date
+  const formatCommentDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
 
   // Also try to parse from initial journal if RPC doesn't have data
   useEffect(() => {
@@ -210,16 +281,20 @@ export default function PostDetailScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Post</Text>
-        <HeaderProfileButton />
-      </View>
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.backButton}>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Post</Text>
+          <HeaderProfileButton />
+        </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {/* Hero Image */}
         {imageUrl && typeof imageUrl === 'string' && imageUrl.length > 0 && (
           <Image source={{ uri: imageUrl }} style={styles.heroImage} />
@@ -234,7 +309,7 @@ export default function PostDetailScreen({ route, navigation }) {
         <View style={styles.authorSection}>
           <TouchableOpacity
             style={styles.authorInfo}
-            onPress={() => journal?.user_id && navigation.navigate('UserProfile', { userId: journal.user_id })}
+            onPress={() => journal?.user_id && navigation.navigate('Profile', { userId: journal.user_id })}
             activeOpacity={0.7}
           >
             {journal?.author_avatar_url && typeof journal.author_avatar_url === 'string' && journal.author_avatar_url.length > 0 ? (
@@ -415,8 +490,100 @@ export default function PostDetailScreen({ route, navigation }) {
           </TouchableOpacity>
         </View>
 
+        {/* Comments Section */}
+        <View style={styles.commentsSection}>
+          <View style={styles.commentsHeader}>
+            <Text style={styles.commentsTitle}>
+              Discussion {commentCount > 0 ? `(${commentCount})` : ''}
+            </Text>
+          </View>
+
+          {/* Comment Input */}
+          <View style={styles.commentInputContainer}>
+            <TextInput
+              style={styles.commentInput}
+              value={newComment}
+              onChangeText={setNewComment}
+              placeholder="Add a comment..."
+              placeholderTextColor="#999"
+              multiline
+              maxLength={500}
+              editable={!addingComment}
+            />
+            <TouchableOpacity
+              style={[
+                styles.commentSubmitButton,
+                (!newComment.trim() || addingComment) && styles.commentSubmitButtonDisabled,
+              ]}
+              onPress={handleAddComment}
+              disabled={!newComment.trim() || addingComment}
+            >
+              {addingComment ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.commentSubmitText}>Post</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* Comments List */}
+          {commentsLoading ? (
+            <View style={styles.commentsLoading}>
+              <ActivityIndicator size="small" color="#999" />
+            </View>
+          ) : comments.length === 0 ? (
+            <View style={styles.noComments}>
+              <Text style={styles.noCommentsText}>No comments yet</Text>
+              <Text style={styles.noCommentsHint}>Be the first to share your thoughts</Text>
+            </View>
+          ) : (
+            <View style={styles.commentsList}>
+              {comments.map((comment) => (
+                <View key={comment.id} style={styles.commentItem}>
+                  <TouchableOpacity
+                    style={styles.commentAuthorAvatar}
+                    onPress={() => comment.user_id && navigation.navigate('Profile', { userId: comment.user_id })}
+                  >
+                    {comment.commenter?.avatar_url ? (
+                      <Image source={{ uri: comment.commenter.avatar_url }} style={styles.commentAvatar} />
+                    ) : (
+                      <View style={styles.commentAvatarPlaceholder}>
+                        <Text style={styles.commentAvatarText}>
+                          {(comment.commenter?.display_name || '?')[0].toUpperCase()}
+                        </Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                  <View style={styles.commentContent}>
+                    <View style={styles.commentHeader}>
+                      <TouchableOpacity
+                        onPress={() => comment.user_id && navigation.navigate('Profile', { userId: comment.user_id })}
+                      >
+                        <Text style={styles.commentAuthorName}>
+                          {comment.commenter?.display_name || 'Anonymous'}
+                        </Text>
+                      </TouchableOpacity>
+                      <Text style={styles.commentTime}>{formatCommentDate(comment.created_at)}</Text>
+                    </View>
+                    <Text style={styles.commentText}>{comment.content}</Text>
+                    {comment.user_id === user?.id && (
+                      <TouchableOpacity
+                        style={styles.commentDeleteButton}
+                        onPress={() => handleDeleteComment(comment.id)}
+                      >
+                        <Text style={styles.commentDeleteText}>Delete</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+
         <View style={styles.bottomSpacer} />
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -425,6 +592,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  keyboardView: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
@@ -706,5 +876,133 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 40,
+  },
+  // Comments styles
+  commentsSection: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  commentsHeader: {
+    marginBottom: 16,
+  },
+  commentsTitle: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#999',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 12,
+    marginBottom: 24,
+  },
+  commentInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#eee',
+    padding: 12,
+    fontSize: 14,
+    fontWeight: '300',
+    color: '#000',
+    maxHeight: 100,
+    minHeight: 44,
+  },
+  commentSubmitButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  commentSubmitButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
+  commentSubmitText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#fff',
+  },
+  commentsLoading: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  noComments: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  noCommentsText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#666',
+    marginBottom: 4,
+  },
+  noCommentsHint: {
+    fontSize: 12,
+    fontWeight: '300',
+    color: '#999',
+  },
+  commentsList: {
+    gap: 20,
+  },
+  commentItem: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  commentAuthorAvatar: {},
+  commentAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  commentAvatarPlaceholder: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  commentAvatarText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666',
+  },
+  commentContent: {
+    flex: 1,
+  },
+  commentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  commentAuthorName: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#000',
+  },
+  commentTime: {
+    fontSize: 11,
+    fontWeight: '300',
+    color: '#999',
+  },
+  commentText: {
+    fontSize: 14,
+    fontWeight: '300',
+    color: '#333',
+    lineHeight: 20,
+  },
+  commentDeleteButton: {
+    marginTop: 6,
+    alignSelf: 'flex-start',
+  },
+  commentDeleteText: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#999',
   },
 });
