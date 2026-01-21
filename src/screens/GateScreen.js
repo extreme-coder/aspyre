@@ -170,7 +170,7 @@ export default function GateScreen({ navigation }) {
 
   // Navigate to author profile
   const handleAuthorPress = useCallback((authorId) => {
-    navigation.navigate('UserProfile', { userId: authorId });
+    navigation.navigate('Profile', { userId: authorId });
   }, [navigation]);
 
   // Render feed card with impression tracking

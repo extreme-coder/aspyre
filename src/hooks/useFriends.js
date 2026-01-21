@@ -143,20 +143,37 @@ export function useFriends(userId) {
       }
 
       // Check if there's already a pending request (either direction)
-      const { data: existingRequest } = await supabase
+      const { data: existingPendingRequest } = await supabase
         .from('friend_requests')
         .select('id, from_user_id, status')
         .or(`and(from_user_id.eq.${userId},to_user_id.eq.${toUserId}),and(from_user_id.eq.${toUserId},to_user_id.eq.${userId})`)
         .eq('status', 'pending')
         .maybeSingle();
 
-      if (existingRequest) {
-        if (existingRequest.from_user_id === toUserId) {
+      if (existingPendingRequest) {
+        if (existingPendingRequest.from_user_id === toUserId) {
           // They already sent us a request - accept it instead
           return { error: { message: 'This user has already sent you a request. Check your incoming requests.' } };
         }
         return { error: { message: 'Friend request already pending' } };
       }
+
+      // Delete any old non-pending requests from us to them (e.g., from a previous friendship)
+      // This handles the case where we were friends, unfriended, and now want to re-add
+      await supabase
+        .from('friend_requests')
+        .delete()
+        .eq('from_user_id', userId)
+        .eq('to_user_id', toUserId)
+        .neq('status', 'pending');
+
+      // Also delete any old non-pending requests from them to us
+      await supabase
+        .from('friend_requests')
+        .delete()
+        .eq('from_user_id', toUserId)
+        .eq('to_user_id', userId)
+        .neq('status', 'pending');
 
       // Send the request
       const { data, error: insertError } = await supabase

@@ -132,7 +132,7 @@ export default function FriendsScreen({ navigation }) {
   };
 
   const navigateToProfile = (userId) => {
-    navigation.navigate('UserProfile', { userId });
+    navigation.navigate('Profile', { userId });
   };
 
   const renderAvatar = (profile, size = 44) => {

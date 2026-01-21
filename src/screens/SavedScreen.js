@@ -76,7 +76,7 @@ export default function SavedScreen({ navigation }) {
   };
 
   const navigateToAuthor = (userId) => {
-    navigation.navigate('UserProfile', { userId });
+    navigation.navigate('Profile', { userId });
   };
 
   const formatDate = (dateStr) => {

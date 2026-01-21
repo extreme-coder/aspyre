@@ -21,7 +21,6 @@ import SettingsScreen from '../screens/SettingsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import PostDetailScreen from '../screens/PostDetailScreen';
 import FriendsScreen from '../screens/FriendsScreen';
-import UserProfileScreen from '../screens/UserProfileScreen';
 import MyJournalDetailScreen from '../screens/MyJournalDetailScreen';
 import JournalEditorScreen from '../screens/JournalEditorScreen';
 import SavedScreen from '../screens/SavedScreen';
@@ -237,11 +236,6 @@ function AppStack() {
       <Stack.Screen
         name="Friends"
         component={FriendsScreen}
-        options={{ animation: 'slide_from_right' }}
-      />
-      <Stack.Screen
-        name="UserProfile"
-        component={UserProfileScreen}
         options={{ animation: 'slide_from_right' }}
       />
       <Stack.Screen
