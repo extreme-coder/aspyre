@@ -1,6 +1,6 @@
 # Aspyre
 
-A React Native app for tracking personal goals and journaling progress.
+A social app for self-improvement. Make progress every day, get inspired.
 
 ## Setup
 
