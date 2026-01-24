@@ -12,7 +12,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useGoals } from '../hooks/useGoals';
-import HeaderProfileButton from '../components/HeaderProfileButton';
+import HeaderRightButtons from '../components/HeaderRightButtons';
 
 const GOAL_TYPE_LABELS = {
   habit: 'Habit',
@@ -122,7 +122,7 @@ export default function GoalsListScreen({ navigation }) {
           <Text style={styles.addButton}>+ New</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Goals</Text>
-        <HeaderProfileButton />
+        <HeaderRightButtons />
       </View>
 
       {/* Toggle Active/Archived */}

@@ -18,13 +18,15 @@ import { useProfile } from '../hooks/useProfile';
 import { useFriends } from '../hooks/useFriends';
 import { useBlocks } from '../hooks/useBlocks';
 import { useUnsavedChanges } from '../contexts/UnsavedChangesContext';
-import HeaderProfileButton from '../components/HeaderProfileButton';
+import HeaderRightButtons from '../components/HeaderRightButtons';
+import { useNotifications } from '../hooks/useNotifications';
 
 export default function SettingsScreen({ navigation }) {
   const { user, signOut } = useAuth();
   const { profile, loading, error, saving, updateProfile, getDeviceTimezone, fetchProfile } = useProfile(user?.id);
   const { friendCount, incomingCount, fetchAll: fetchFriends } = useFriends(user?.id);
   const { blockedUsers, unblockUser, fetchBlockedUsers } = useBlocks(user?.id);
+  const { unreadCount } = useNotifications(user?.id);
   const { setUnsaved, clearUnsaved } = useUnsavedChanges();
 
   // Refetch profile when screen comes into focus
@@ -264,7 +266,7 @@ export default function SettingsScreen({ navigation }) {
       <View style={styles.header}>
         <View style={styles.placeholder} />
         <Text style={styles.title}>Settings</Text>
-        <HeaderProfileButton />
+        <HeaderRightButtons />
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
@@ -349,12 +351,25 @@ export default function SettingsScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Friends Section */}
+        {/* Social Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Social</Text>
 
           <TouchableOpacity
             style={styles.linkRow}
+            onPress={() => navigation.navigate('Notifications')}
+          >
+            <View style={styles.linkRowContent}>
+              <Text style={styles.linkRowLabel}>Notifications</Text>
+              <Text style={styles.linkRowValue}>
+                {unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}
+              </Text>
+            </View>
+            <Text style={styles.linkRowArrow}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.linkRow, styles.linkRowBorderTop]}
             onPress={() => navigation.navigate('Friends')}
           >
             <View style={styles.linkRowContent}>
@@ -763,6 +778,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#eee',
     padding: 16,
+  },
+  linkRowBorderTop: {
+    borderTopWidth: 0,
   },
   linkRowContent: {
     flex: 1,

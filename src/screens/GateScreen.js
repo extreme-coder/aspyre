@@ -20,6 +20,7 @@ import { useGoals } from '../hooks/useGoals';
 import { useImpressions } from '../hooks/useImpressions';
 import FeedCard from '../components/FeedCard';
 import ReportModal from '../components/ReportModal';
+import NotificationBadge from '../components/NotificationBadge';
 
 const FILTER_OPTIONS = [
   { key: FeedFilter.DISCOVER, label: 'Discover' },
@@ -296,6 +297,13 @@ export default function GateScreen({ navigation }) {
             >
               <Text style={styles.tertiaryButtonText}>View Goals</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.tertiaryButton}
+              onPress={() => navigation.navigate('Notifications')}
+            >
+              <Text style={styles.tertiaryButtonText}>View Notifications</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </SafeAreaView>
@@ -337,6 +345,12 @@ export default function GateScreen({ navigation }) {
             >
               <Text style={styles.linkButtonText}>View Goals</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.linkButton}
+              onPress={() => navigation.navigate('Notifications')}
+            >
+              <Text style={styles.linkButtonText}>Notifications</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.explainer}>
@@ -361,23 +375,26 @@ export default function GateScreen({ navigation }) {
           </Text>
           <Text style={styles.timerLabel}>remaining</Text>
         </View>
-        <TouchableOpacity
-          style={styles.profileButton}
-          onPress={() => navigation.navigate('Profile')}
-        >
-          {profile?.avatar_url && typeof profile.avatar_url === 'string' && profile.avatar_url.length > 0 ? (
-            <Image
-              source={{ uri: profile.avatar_url }}
-              style={styles.profilePic}
-            />
-          ) : (
-            <View style={styles.profilePicPlaceholder}>
-              <Text style={styles.profilePicInitial}>
-                {profile?.display_name?.charAt(0)?.toUpperCase() || '?'}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
+        <View style={styles.headerRightButtons}>
+          <NotificationBadge />
+          <TouchableOpacity
+            style={styles.profileButton}
+            onPress={() => navigation.navigate('Profile')}
+          >
+            {profile?.avatar_url && typeof profile.avatar_url === 'string' && profile.avatar_url.length > 0 ? (
+              <Image
+                source={{ uri: profile.avatar_url }}
+                style={styles.profilePic}
+              />
+            ) : (
+              <View style={styles.profilePicPlaceholder}>
+                <Text style={styles.profilePicInitial}>
+                  {profile?.display_name?.charAt(0)?.toUpperCase() || '?'}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Filter Chips */}
@@ -603,8 +620,14 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginTop: 2,
   },
-  profileButton: {
+  headerRightButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     width: 80,
+    justifyContent: 'flex-end',
+  },
+  profileButton: {
     alignItems: 'flex-end',
   },
   profilePic: {

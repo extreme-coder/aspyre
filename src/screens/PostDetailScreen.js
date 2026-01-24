@@ -16,7 +16,7 @@ import {
 import { supabase } from '../config/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useComments } from '../hooks/useComments';
-import HeaderProfileButton from '../components/HeaderProfileButton';
+import HeaderRightButtons from '../components/HeaderRightButtons';
 
 const GOAL_TYPE_LABELS = {
   habit: 'Habit',
@@ -291,7 +291,7 @@ export default function PostDetailScreen({ route, navigation }) {
             <Text style={styles.backButton}>Back</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Post</Text>
-          <HeaderProfileButton />
+          <HeaderRightButtons />
         </View>
 
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">

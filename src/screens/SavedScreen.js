@@ -14,7 +14,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useSavedJournals } from '../hooks/useSavedJournals';
-import HeaderProfileButton from '../components/HeaderProfileButton';
+import HeaderRightButtons from '../components/HeaderRightButtons';
 
 /**
  * Dedicated Saved screen for viewing saved posts.
@@ -173,7 +173,7 @@ export default function SavedScreen({ navigation }) {
           <Text style={styles.backButton}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Saved</Text>
-        <HeaderProfileButton />
+        <HeaderRightButtons />
       </View>
 
       <ScrollView

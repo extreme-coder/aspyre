@@ -13,7 +13,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useFriends } from '../hooks/useFriends';
-import HeaderProfileButton from '../components/HeaderProfileButton';
+import HeaderRightButtons from '../components/HeaderRightButtons';
 
 const TABS = ['Friends', 'Requests'];
 
@@ -324,7 +324,7 @@ export default function FriendsScreen({ navigation, route }) {
             <Text style={styles.backButton}>Back</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Friends</Text>
-          <HeaderProfileButton />
+          <HeaderRightButtons />
         </View>
         <View style={styles.loading}>
           <ActivityIndicator size="large" color="#000" />
@@ -340,7 +340,7 @@ export default function FriendsScreen({ navigation, route }) {
           <Text style={styles.backButton}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Friends</Text>
-        <HeaderProfileButton />
+        <HeaderRightButtons />
       </View>
 
       {/* Tabs */}

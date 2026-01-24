@@ -20,7 +20,7 @@ import { useJournal } from '../hooks/useJournal';
 import { useGoals } from '../hooks/useGoals';
 import { useProfile } from '../hooks/useProfile';
 import { formatDateForDisplay } from '../utils/dateUtils';
-import HeaderProfileButton from '../components/HeaderProfileButton';
+import HeaderRightButtons from '../components/HeaderRightButtons';
 
 const PRIVACY_OPTIONS = [
   { value: 'everyone', label: 'Everyone' },
@@ -592,7 +592,7 @@ export default function JournalComposeScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <HeaderProfileButton />
+          <HeaderRightButtons />
           <View style={styles.headerCenter}>
             <Text style={styles.title}>Your Post</Text>
             <Text style={styles.dateText}>{formatDateForDisplay(localDate)}</Text>
