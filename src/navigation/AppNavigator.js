@@ -1,8 +1,11 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+
+// Navigation ref for use outside of React components (e.g., notification handlers)
+export const navigationRef = createNavigationContainerRef();
 
 import { useAuth } from '../contexts/AuthContext';
 import { UnsavedChangesProvider, useUnsavedChanges } from '../contexts/UnsavedChangesContext';
@@ -268,7 +271,7 @@ function AppStack() {
   );
 }
 
-export default function AppNavigator() {
+export default function AppNavigator({ onReady }) {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -281,7 +284,7 @@ export default function AppNavigator() {
 
   return (
     <UnsavedChangesProvider>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef} onReady={onReady}>
         {user ? <AppStack /> : <AuthStack />}
       </NavigationContainer>
     </UnsavedChangesProvider>

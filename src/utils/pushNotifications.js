@@ -127,13 +127,14 @@ export function getNotificationNavigation(notification) {
     case 'friend_accepted':
       return {
         screen: 'Friends',
-        params: { tab: type === 'friend_request' ? 'requests' : 'friends' },
+        params: { tab: type === 'friend_request' ? 'Requests' : 'Friends' },
       };
     case 'comment':
     case 'kudos':
+      if (!data?.journal_id) return null;
       return {
         screen: 'PostDetail',
-        params: { journalId: data?.journal_id },
+        params: { journal: { id: data.journal_id } },
       };
     default:
       return null;

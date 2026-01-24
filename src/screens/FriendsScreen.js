@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import HeaderProfileButton from '../components/HeaderProfileButton';
 
 const TABS = ['Friends', 'Requests'];
 
-export default function FriendsScreen({ navigation }) {
+export default function FriendsScreen({ navigation, route }) {
   const { user } = useAuth();
   const {
     friends,
@@ -34,7 +34,9 @@ export default function FriendsScreen({ navigation }) {
     outgoingCount,
   } = useFriends(user?.id);
 
-  const [activeTab, setActiveTab] = useState('Friends');
+  // Use tab from route params if provided (e.g., from notification navigation)
+  const initialTab = route.params?.tab && TABS.includes(route.params.tab) ? route.params.tab : 'Friends';
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [refreshing, setRefreshing] = useState(false);
   const [processingId, setProcessingId] = useState(null);
 
@@ -43,6 +45,13 @@ export default function FriendsScreen({ navigation }) {
       fetchAll();
     }, [fetchAll])
   );
+
+  // Update active tab when navigating with a new tab param
+  useEffect(() => {
+    if (route.params?.tab && TABS.includes(route.params.tab)) {
+      setActiveTab(route.params.tab);
+    }
+  }, [route.params?.tab]);
 
   const onRefresh = async () => {
     setRefreshing(true);
