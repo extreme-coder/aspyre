@@ -20,7 +20,6 @@ import { useJournal } from '../hooks/useJournal';
 import { useGoals } from '../hooks/useGoals';
 import { useProfile } from '../hooks/useProfile';
 import { formatDateForDisplay } from '../utils/dateUtils';
-import HeaderRightButtons from '../components/HeaderRightButtons';
 
 const PRIVACY_OPTIONS = [
   { value: 'everyone', label: 'Everyone' },
@@ -591,12 +590,8 @@ export default function JournalComposeScreen({ navigation }) {
 
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <HeaderRightButtons />
-          <View style={styles.headerCenter}>
-            <Text style={styles.title}>Your Post</Text>
-            <Text style={styles.dateText}>{formatDateForDisplay(localDate)}</Text>
-          </View>
+        <View style={styles.topBar}>
+          <Text style={styles.dateText}>{formatDateForDisplay(localDate)}</Text>
           <TouchableOpacity onPress={enterEditMode}>
             <Text style={styles.editButton}>Edit</Text>
           </TouchableOpacity>
@@ -737,7 +732,7 @@ export default function JournalComposeScreen({ navigation }) {
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.header}>
+        <View style={styles.topBar}>
           <TouchableOpacity
             onPress={() => {
               if (hasUnsavedChanges()) {
@@ -752,8 +747,6 @@ export default function JournalComposeScreen({ navigation }) {
                       onPress: () => {
                         if (isEditing) {
                           setIsEditing(false);
-                        } else {
-                          navigation.goBack();
                         }
                       },
                     },
@@ -762,18 +755,13 @@ export default function JournalComposeScreen({ navigation }) {
               } else {
                 if (isEditing) {
                   setIsEditing(false);
-                } else {
-                  navigation.goBack();
                 }
               }
             }}
           >
-            <Text style={styles.cancelButton}>{isEditing ? 'Cancel' : 'Cancel'}</Text>
+            <Text style={styles.cancelButton}>{isEditing ? 'Cancel' : ''}</Text>
           </TouchableOpacity>
-          <View style={styles.headerCenter}>
-            <Text style={styles.title}>{isEditing ? 'Edit Post' : 'New Post'}</Text>
-            <Text style={styles.dateText}>{formatDateForDisplay(localDate)}</Text>
-          </View>
+          <Text style={styles.dateText}>{formatDateForDisplay(localDate)}</Text>
           <TouchableOpacity onPress={handleSave} disabled={saving || uploadingImage}>
             {saving || uploadingImage ? (
               <ActivityIndicator size="small" color="#000" />
@@ -1139,17 +1127,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  header: {
+  topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-  },
-  headerCenter: {
-    alignItems: 'center',
   },
   cancelButton: {
     fontSize: 14,
@@ -1157,17 +1142,11 @@ const styles = StyleSheet.create({
     color: '#666',
     minWidth: 50,
   },
-  title: {
-    fontSize: 14,
-    fontWeight: '500',
-    letterSpacing: 1,
-    color: '#000',
-  },
   dateText: {
-    fontSize: 10,
-    fontWeight: '300',
-    color: '#999',
-    marginTop: 2,
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#666',
+    letterSpacing: 1,
   },
   saveButton: {
     fontSize: 14,

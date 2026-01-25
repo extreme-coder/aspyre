@@ -925,13 +925,15 @@ export default function ProfileScreen({ route, navigation }) {
   if (loading && !profile) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Profile</Text>
-          <View style={styles.placeholder} />
-        </View>
+        {!isOwnProfile && (
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text style={styles.backButton}>Back</Text>
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Profile</Text>
+            <View style={styles.placeholder} />
+          </View>
+        )}
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#000" />
         </View>
@@ -961,21 +963,26 @@ export default function ProfileScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profile</Text>
-        {isOwnProfile ? (
-          <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Settings' })}>
-            <Text style={styles.settingsButton}>Settings</Text>
+      {isOwnProfile ? (
+        <View style={styles.ownProfileHeader}>
+          <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
+            <Text style={styles.editButton}>Edit</Text>
           </TouchableOpacity>
-        ) : (
+          <TouchableOpacity onPress={() => navigation.navigate('Friends')}>
+            <Text style={styles.settingsButton}>Friends</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.backButton}>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Profile</Text>
           <TouchableOpacity onPress={handleBlock}>
             <Text style={styles.blockButton}>Block</Text>
           </TouchableOpacity>
-        )}
-      </View>
+        </View>
+      )}
 
       <ScrollView
         style={styles.scrollView}
@@ -1042,6 +1049,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  ownProfileHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  editButton: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#000',
   },
   header: {
     flexDirection: 'row',

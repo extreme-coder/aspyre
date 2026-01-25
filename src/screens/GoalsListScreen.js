@@ -12,7 +12,6 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useGoals } from '../hooks/useGoals';
-import HeaderRightButtons from '../components/HeaderRightButtons';
 
 const GOAL_TYPE_LABELS = {
   habit: 'Habit',
@@ -117,14 +116,6 @@ export default function GoalsListScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.addButtonContainer} onPress={handleCreateGoal}>
-          <Text style={styles.addButton}>+ New</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Goals</Text>
-        <HeaderRightButtons />
-      </View>
-
       {/* Toggle Active/Archived */}
       <View style={styles.toggleRow}>
         <TouchableOpacity
@@ -175,6 +166,13 @@ export default function GoalsListScreen({ navigation }) {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
         />
+      )}
+
+      {/* Floating Add Button */}
+      {!showArchived && (
+        <TouchableOpacity style={styles.fab} onPress={handleCreateGoal}>
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
       )}
     </SafeAreaView>
   );
@@ -355,5 +353,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     letterSpacing: 2,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  fabText: {
+    fontSize: 28,
+    fontWeight: '300',
+    color: '#fff',
+    marginTop: -2,
   },
 });

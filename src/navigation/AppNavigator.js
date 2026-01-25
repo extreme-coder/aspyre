@@ -2,12 +2,15 @@ import React from 'react';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 // Navigation ref for use outside of React components (e.g., notification handlers)
 export const navigationRef = createNavigationContainerRef();
 
 import { useAuth } from '../contexts/AuthContext';
+import { useProfile } from '../hooks/useProfile';
+import { useNotifications } from '../hooks/useNotifications';
 import { UnsavedChangesProvider, useUnsavedChanges } from '../contexts/UnsavedChangesContext';
 
 // Auth screens
@@ -33,7 +36,6 @@ import NotificationsScreen from '../screens/NotificationsScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const GoalsStack = createNativeStackNavigator();
-
 
 // Auth Stack
 function AuthStack() {
@@ -68,19 +70,62 @@ function GoalsStackNavigator() {
   );
 }
 
+// Avatar Tab Icon component
+function AvatarTabIcon({ focused }) {
+  const { user } = useAuth();
+  const { profile } = useProfile(user?.id);
+
+  if (profile?.avatar_url && typeof profile.avatar_url === 'string' && profile.avatar_url.length > 0) {
+    return (
+      <View style={[styles.avatarContainer, focused && styles.avatarContainerFocused]}>
+        <Image source={{ uri: profile.avatar_url }} style={styles.avatarImage} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={[styles.avatarContainer, focused && styles.avatarContainerFocused]}>
+      <View style={[styles.avatarPlaceholder, focused && styles.avatarPlaceholderFocused]}>
+        <Text style={[styles.avatarInitial, focused && styles.avatarInitialFocused]}>
+          {profile?.display_name?.charAt(0)?.toUpperCase() || '?'}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+// Notification icon with badge
+function NotificationTabIcon({ focused, color }) {
+  const { user } = useAuth();
+  const { unreadCount } = useNotifications(user?.id);
+
+  return (
+    <View style={styles.notificationIconContainer}>
+      <Ionicons
+        name={focused ? 'notifications' : 'notifications-outline'}
+        size={24}
+        color={color}
+      />
+      {unreadCount > 0 && (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
 // Main Tab Navigator
 function MainTabs() {
   const { unsavedScreens } = useUnsavedChanges();
 
-  // Create listeners that check for unsaved changes before allowing tab switch
-  const createTabListeners = (screenName) => ({
+  const createUnsavedChangesListener = (screenName, navigation) => ({
     tabPress: (e) => {
-      // Find if any screen has unsaved changes
-      const unsavedScreen = Object.entries(unsavedScreens).find(([name, hasChanges]) => hasChanges && name !== screenName);
-
+      const unsavedScreen = Object.entries(unsavedScreens).find(([, hasChanges]) => hasChanges);
       if (unsavedScreen) {
         e.preventDefault();
-
         Alert.alert(
           'Discard changes?',
           'You have unsaved changes. Are you sure you want to leave?',
@@ -89,11 +134,7 @@ function MainTabs() {
             {
               text: 'Discard',
               style: 'destructive',
-              onPress: () => {
-                // Navigate to the target tab
-                e.target && e.target.split('-')[0] &&
-                  e.data?.navigation?.navigate(screenName);
-              },
+              onPress: () => navigation.navigate(screenName),
             },
           ]
         );
@@ -106,112 +147,70 @@ function MainTabs() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: styles.tabBar,
-        tabBarShowLabel: true,
-        tabBarIconStyle: { display: 'none' },
+        tabBarShowLabel: false,
         tabBarActiveTintColor: '#000',
         tabBarInactiveTintColor: '#999',
-        tabBarLabelStyle: styles.tabLabel,
       }}
     >
       <Tab.Screen
         name="Home"
         component={GateScreen}
-        options={{ tabBarLabel: 'HOME' }}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            const unsavedScreen = Object.entries(unsavedScreens).find(([, hasChanges]) => hasChanges);
-            if (unsavedScreen) {
-              e.preventDefault();
-              Alert.alert(
-                'Discard changes?',
-                'You have unsaved changes. Are you sure you want to leave?',
-                [
-                  { text: 'Keep Editing', style: 'cancel' },
-                  {
-                    text: 'Discard',
-                    style: 'destructive',
-                    onPress: () => navigation.navigate('Home'),
-                  },
-                ]
-              );
-            }
-          },
-        })}
-      />
-      <Tab.Screen
-        name="Post"
-        component={JournalComposeScreen}
-        options={{ tabBarLabel: 'POST' }}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            const unsavedScreen = Object.entries(unsavedScreens).find(([, hasChanges]) => hasChanges);
-            if (unsavedScreen) {
-              e.preventDefault();
-              Alert.alert(
-                'Discard changes?',
-                'You have unsaved changes. Are you sure you want to leave?',
-                [
-                  { text: 'Keep Editing', style: 'cancel' },
-                  {
-                    text: 'Discard',
-                    style: 'destructive',
-                    onPress: () => navigation.navigate('Post'),
-                  },
-                ]
-              );
-            }
-          },
-        })}
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? 'home' : 'home-outline'}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+        listeners={({ navigation }) => createUnsavedChangesListener('Home', navigation)}
       />
       <Tab.Screen
         name="Goals"
         component={GoalsStackNavigator}
-        options={{ tabBarLabel: 'GOALS' }}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            const unsavedScreen = Object.entries(unsavedScreens).find(([, hasChanges]) => hasChanges);
-            if (unsavedScreen) {
-              e.preventDefault();
-              Alert.alert(
-                'Discard changes?',
-                'You have unsaved changes. Are you sure you want to leave?',
-                [
-                  { text: 'Keep Editing', style: 'cancel' },
-                  {
-                    text: 'Discard',
-                    style: 'destructive',
-                    onPress: () => navigation.navigate('Goals'),
-                  },
-                ]
-              );
-            }
-          },
-        })}
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? 'flag' : 'flag-outline'}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+        listeners={({ navigation }) => createUnsavedChangesListener('Goals', navigation)}
       />
       <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ tabBarLabel: 'SETTINGS' }}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            const unsavedScreen = Object.entries(unsavedScreens).find(([, hasChanges]) => hasChanges);
-            if (unsavedScreen) {
-              e.preventDefault();
-              Alert.alert(
-                'Discard changes?',
-                'You have unsaved changes. Are you sure you want to leave?',
-                [
-                  { text: 'Keep Editing', style: 'cancel' },
-                  {
-                    text: 'Discard',
-                    style: 'destructive',
-                    onPress: () => navigation.navigate('Settings'),
-                  },
-                ]
-              );
-            }
-          },
-        })}
+        name="Post"
+        component={JournalComposeScreen}
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? 'add-circle' : 'add-circle-outline'}
+              size={28}
+              color={color}
+            />
+          ),
+        }}
+        listeners={({ navigation }) => createUnsavedChangesListener('Post', navigation)}
+      />
+      <Tab.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <NotificationTabIcon focused={focused} color={color} />
+          ),
+        }}
+        listeners={({ navigation }) => createUnsavedChangesListener('Notifications', navigation)}
+      />
+      <Tab.Screen
+        name="Account"
+        component={ProfileScreen}
+        options={{
+          tabBarIcon: ({ focused }) => <AvatarTabIcon focused={focused} />,
+        }}
+        listeners={({ navigation }) => createUnsavedChangesListener('Account', navigation)}
       />
     </Tab.Navigator>
   );
@@ -262,11 +261,6 @@ function AppStack() {
         component={EditProfileScreen}
         options={{ animation: 'slide_from_right' }}
       />
-      <Stack.Screen
-        name="Notifications"
-        component={NotificationsScreen}
-        options={{ animation: 'slide_from_right' }}
-      />
     </Stack.Navigator>
   );
 }
@@ -302,13 +296,60 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    height: 70,
-    paddingBottom: 30,
-    paddingTop: 12,
+    height: 85,
+    paddingTop: 10,
+    paddingBottom: 25,
   },
-  tabLabel: {
-    fontSize: 10,
+  avatarContainer: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  avatarContainerFocused: {
+    borderWidth: 2,
+    borderColor: '#000',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  avatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarPlaceholderFocused: {
+    backgroundColor: '#e0e0e0',
+  },
+  avatarInitial: {
+    fontSize: 12,
     fontWeight: '500',
-    letterSpacing: 2,
+    color: '#999',
+  },
+  avatarInitialFocused: {
+    color: '#000',
+  },
+  notificationIconContainer: {
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -8,
+    backgroundColor: '#000',
+    borderRadius: 10,
+    minWidth: 16,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#fff',
   },
 });

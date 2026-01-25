@@ -20,7 +20,6 @@ import { useGoals } from '../hooks/useGoals';
 import { useImpressions } from '../hooks/useImpressions';
 import FeedCard from '../components/FeedCard';
 import ReportModal from '../components/ReportModal';
-import NotificationBadge from '../components/NotificationBadge';
 
 const FILTER_OPTIONS = [
   { key: FeedFilter.DISCOVER, label: 'Discover' },
@@ -269,42 +268,12 @@ export default function GateScreen({ navigation }) {
             Resets at {getNextResetTime()}
           </Text>
 
-          <View style={styles.timesUpActions}>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={() => navigation.navigate('Profile')}
-            >
-              <Text style={styles.primaryButtonText}>View My Profile</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => navigation.navigate('Saved')}
-            >
-              <Text style={styles.secondaryButtonText}>View Saved Posts</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.tertiaryButton}
-              onPress={() => navigation.navigate('Post', { draftMode: 'tomorrow' })}
-            >
-              <Text style={styles.tertiaryButtonText}>Draft Tomorrow's Post</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.tertiaryButton}
-              onPress={() => navigation.navigate('Goals')}
-            >
-              <Text style={styles.tertiaryButtonText}>View Goals</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.tertiaryButton}
-              onPress={() => navigation.navigate('Notifications')}
-            >
-              <Text style={styles.tertiaryButtonText}>View Notifications</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => navigation.navigate('Saved')}
+          >
+            <Text style={styles.secondaryButtonText}>View Saved Posts</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -332,27 +301,6 @@ export default function GateScreen({ navigation }) {
             <Text style={styles.primaryButtonText}>Post Today's Journal</Text>
           </TouchableOpacity>
 
-          <View style={styles.secondaryActions}>
-            <TouchableOpacity
-              style={styles.linkButton}
-              onPress={() => navigation.navigate('Profile')}
-            >
-              <Text style={styles.linkButtonText}>View Profile</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.linkButton}
-              onPress={() => navigation.navigate('Goals')}
-            >
-              <Text style={styles.linkButtonText}>View Goals</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.linkButton}
-              onPress={() => navigation.navigate('Notifications')}
-            >
-              <Text style={styles.linkButtonText}>Notifications</Text>
-            </TouchableOpacity>
-          </View>
-
           <View style={styles.explainer}>
             <Text style={styles.explainerText}>
               Share your progress first, then see what others are working on.
@@ -366,35 +314,11 @@ export default function GateScreen({ navigation }) {
   // FEED_UNLOCKED state - show feed inline
   return (
     <SafeAreaView style={styles.container}>
-      {/* Timer Header */}
-      <View style={styles.timerHeader}>
-        <Text style={styles.headerLogo}>ASPYRE</Text>
-        <View style={styles.timerContainer}>
-          <Text style={[styles.timer, { color: getTimerColor() }]}>
-            {formatTimeRemaining()}
-          </Text>
-          <Text style={styles.timerLabel}>remaining</Text>
-        </View>
-        <View style={styles.headerRightButtons}>
-          <NotificationBadge />
-          <TouchableOpacity
-            style={styles.profileButton}
-            onPress={() => navigation.navigate('Profile')}
-          >
-            {profile?.avatar_url && typeof profile.avatar_url === 'string' && profile.avatar_url.length > 0 ? (
-              <Image
-                source={{ uri: profile.avatar_url }}
-                style={styles.profilePic}
-              />
-            ) : (
-              <View style={styles.profilePicPlaceholder}>
-                <Text style={styles.profilePicInitial}>
-                  {profile?.display_name?.charAt(0)?.toUpperCase() || '?'}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
+      {/* Timer Bar */}
+      <View style={styles.timerBar}>
+        <Text style={[styles.timerText, { color: getTimerColor() }]}>
+          {formatTimeRemaining()} remaining
+        </Text>
       </View>
 
       {/* Filter Chips */}
@@ -583,70 +507,18 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginBottom: 40,
   },
-  timesUpActions: {
-    width: '100%',
-    alignItems: 'center',
-  },
   // Feed styles
-  timerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  timerBar: {
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  headerLogo: {
-    fontSize: 14,
-    fontWeight: '300',
-    letterSpacing: 4,
-    color: '#000',
-    width: 80,
-  },
-  timerContainer: {
-    alignItems: 'center',
-  },
-  timer: {
-    fontSize: 20,
+  timerText: {
+    fontSize: 12,
     fontWeight: '500',
-    letterSpacing: 2,
-    fontVariant: ['tabular-nums'],
-  },
-  timerLabel: {
-    fontSize: 10,
-    fontWeight: '300',
-    color: '#999',
     letterSpacing: 1,
-    marginTop: 2,
-  },
-  headerRightButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    width: 80,
-    justifyContent: 'flex-end',
-  },
-  profileButton: {
-    alignItems: 'flex-end',
-  },
-  profilePic: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-  },
-  profilePicPlaceholder: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profilePicInitial: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
+    fontVariant: ['tabular-nums'],
   },
   filterContainer: {
     borderBottomWidth: 1,

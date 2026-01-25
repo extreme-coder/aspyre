@@ -181,13 +181,6 @@ export default function NotificationsScreen({ navigation }) {
   if (loading && notifications.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.title}>Notifications</Text>
-          <View style={styles.placeholder} />
-        </View>
         <View style={styles.loading}>
           <ActivityIndicator size="large" color="#000" />
         </View>
@@ -197,23 +190,20 @@ export default function NotificationsScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Notifications</Text>
-        {unreadCount > 0 ? (
-          <TouchableOpacity onPress={handleMarkAllRead}>
-            <Text style={styles.markReadButton}>Mark Read</Text>
-          </TouchableOpacity>
-        ) : notifications.length > 0 ? (
-          <TouchableOpacity onPress={handleClearAll}>
-            <Text style={styles.clearButton}>Clear</Text>
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.placeholder} />
-        )}
-      </View>
+      {/* Action bar */}
+      {(unreadCount > 0 || notifications.length > 0) && (
+        <View style={styles.actionBar}>
+          {unreadCount > 0 ? (
+            <TouchableOpacity onPress={handleMarkAllRead}>
+              <Text style={styles.actionButton}>Mark all read</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={handleClearAll}>
+              <Text style={styles.actionButton}>Clear all</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
 
       {error ? (
         renderError()
@@ -241,43 +231,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  header: {
+  actionBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
     paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  backButton: {
-    fontSize: 14,
-    fontWeight: '400',
+  actionButton: {
+    fontSize: 12,
+    fontWeight: '500',
     color: '#666',
-    minWidth: 70,
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '500',
-    letterSpacing: 1,
-    color: '#000',
-  },
-  markReadButton: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
-    minWidth: 70,
-    textAlign: 'right',
-  },
-  clearButton: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#999',
-    minWidth: 70,
-    textAlign: 'right',
-  },
-  placeholder: {
-    minWidth: 70,
   },
   loading: {
     flex: 1,
