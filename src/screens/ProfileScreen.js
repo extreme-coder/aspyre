@@ -14,17 +14,17 @@ import {
   Modal,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../hooks/useProfile';
 import { useProfileStats } from '../hooks/useProfileStats';
 import { useMyJournals } from '../hooks/useMyJournals';
-import { useSavedJournals } from '../hooks/useSavedJournals';
 import { useGoals } from '../hooks/useGoals';
 import { useFriends } from '../hooks/useFriends';
 import { useBlocks } from '../hooks/useBlocks';
 import { supabase } from '../config/supabase';
 
-const TABS = ['Journals', 'Saved', 'Goals', 'Insights'];
+const TABS = ['Journals', 'Goals', 'Insights'];
 const OTHER_USER_TABS = ['Journals', 'Goals'];
 
 const PRIVACY_LABELS = {
@@ -52,13 +52,6 @@ export default function ProfileScreen({ route, navigation }) {
     deleteJournal,
     refresh: refreshJournals,
   } = useMyJournals(isOwnProfile ? user?.id : null);
-  const {
-    savedJournals,
-    loading: savedLoading,
-    fetchSavedJournals,
-    unsaveJournal,
-    refresh: refreshSaved,
-  } = useSavedJournals(isOwnProfile ? user?.id : null);
   const { activeGoals, loading: goalsLoading, fetchGoals } = useGoals(isOwnProfile ? user?.id : null);
 
   // Other user profile state
@@ -86,6 +79,7 @@ export default function ProfileScreen({ route, navigation }) {
 
   const [actionLoading, setActionLoading] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
   const [requestNote, setRequestNote] = useState('');
 
   const relationshipStatus = !isOwnProfile ? getRelationshipStatus(viewingUserId) : null;
@@ -182,7 +176,6 @@ export default function ProfileScreen({ route, navigation }) {
       if (isOwnProfile) {
         fetchStats();
         fetchJournals();
-        fetchSavedJournals();
         fetchGoals();
       } else {
         fetchOtherProfile();
@@ -190,7 +183,7 @@ export default function ProfileScreen({ route, navigation }) {
         fetchOtherGoals();
         fetchFriends();
       }
-    }, [isOwnProfile, fetchStats, fetchJournals, fetchSavedJournals, fetchGoals, fetchOtherProfile, fetchOtherJournals, fetchOtherGoals, fetchFriends])
+    }, [isOwnProfile, fetchStats, fetchJournals, fetchGoals, fetchOtherProfile, fetchOtherJournals, fetchOtherGoals, fetchFriends])
   );
 
   const onRefresh = async () => {
@@ -199,7 +192,6 @@ export default function ProfileScreen({ route, navigation }) {
       await Promise.all([
         fetchStats(),
         activeTab === 'Journals' ? refreshJournals() : Promise.resolve(),
-        activeTab === 'Saved' ? refreshSaved() : Promise.resolve(),
         activeTab === 'Goals' ? fetchGoals() : Promise.resolve(),
       ]);
     } else {
@@ -378,25 +370,8 @@ export default function ProfileScreen({ route, navigation }) {
     );
   };
 
-  const handleUnsave = async (journalId) => {
-    const result = await unsaveJournal(journalId);
-    if (result.error) {
-      Alert.alert('Error', result.error.message || 'Failed to unsave');
-    }
-  };
-
   const navigateToJournalDetail = (journal) => {
     navigation.navigate('MyJournalDetail', { journal, isOwnJournal: true });
-  };
-
-  const navigateToSavedDetail = (journal) => {
-    const transformedJournal = {
-      ...journal,
-      author_display_name: journal.author_display_name,
-      author_handle: journal.author_handle,
-      author_avatar_url: journal.author_avatar_url,
-    };
-    navigation.navigate('PostDetail', { journal: transformedJournal });
   };
 
   const navigateToOtherJournalDetail = (journal) => {
@@ -415,8 +390,8 @@ export default function ProfileScreen({ route, navigation }) {
   const renderActionButton = () => {
     if (actionLoading) {
       return (
-        <View style={styles.friendActionButton}>
-          <ActivityIndicator size="small" color="#fff" />
+        <View style={styles.singleActionButton}>
+          <ActivityIndicator size="small" color="#000" />
         </View>
       );
     }
@@ -455,7 +430,7 @@ export default function ProfileScreen({ route, navigation }) {
 
       default:
         return (
-          <TouchableOpacity style={styles.friendActionButton} onPress={handleSendRequest}>
+          <TouchableOpacity style={styles.singleActionButton} onPress={handleSendRequest}>
             <Text style={styles.friendActionButtonText}>Add Friend</Text>
           </TouchableOpacity>
         );
@@ -522,14 +497,22 @@ export default function ProfileScreen({ route, navigation }) {
         </View>
       )}
 
-      {/* Edit Profile Button (own profile) or Friend Actions (other user) */}
+      {/* Edit Profile & Saved Buttons (own profile) or Friend Actions (other user) */}
       {isOwnProfile ? (
-        <TouchableOpacity
-          style={styles.editProfileButton}
-          onPress={() => navigation.navigate('EditProfile')}
-        >
-          <Text style={styles.editProfileText}>Edit Profile</Text>
-        </TouchableOpacity>
+        <View style={styles.profileButtonsRow}>
+          <TouchableOpacity
+            style={styles.editProfileButton}
+            onPress={() => navigation.navigate('EditProfile')}
+          >
+            <Text style={styles.editProfileText}>Edit Profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.savedButton}
+            onPress={() => navigation.navigate('Saved')}
+          >
+            <Text style={styles.savedButtonText}>Saved</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
         <View style={styles.friendActionSection}>
           {renderActionButton()}
@@ -555,6 +538,15 @@ export default function ProfileScreen({ route, navigation }) {
     </View>
   );
 
+  const getTabIcon = (tab, isActive) => {
+    const icons = {
+      Journals: isActive ? 'book' : 'book-outline',
+      Goals: isActive ? 'flag' : 'flag-outline',
+      Insights: isActive ? 'stats-chart' : 'stats-chart-outline',
+    };
+    return icons[tab] || 'ellipse-outline';
+  };
+
   const renderTabs = () => {
     const tabs = isOwnProfile ? TABS : OTHER_USER_TABS;
 
@@ -562,15 +554,6 @@ export default function ProfileScreen({ route, navigation }) {
       <View style={styles.tabs}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab;
-          let count = null;
-          if (isOwnProfile) {
-            if (tab === 'Journals') count = stats.totalJournals;
-            if (tab === 'Saved') count = savedJournals.length;
-            if (tab === 'Goals') count = activeGoals.length;
-          } else {
-            if (tab === 'Journals') count = otherJournals.length;
-            if (tab === 'Goals') count = otherGoals.length;
-          }
 
           return (
             <TouchableOpacity
@@ -578,10 +561,11 @@ export default function ProfileScreen({ route, navigation }) {
               style={[styles.tab, isActive && styles.tabActive]}
               onPress={() => setActiveTab(tab)}
             >
-              <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
-                {tab}
-                {count !== null && count > 0 ? ` (${count})` : ''}
-              </Text>
+              <Ionicons
+                name={getTabIcon(tab, isActive)}
+                size={22}
+                color={isActive ? '#000' : '#999'}
+              />
             </TouchableOpacity>
           );
         })}
@@ -724,62 +708,6 @@ export default function ProfileScreen({ route, navigation }) {
     }
   };
 
-  const renderSavedItem = (journal) => (
-    <TouchableOpacity
-      key={journal.id}
-      style={styles.savedItem}
-      onPress={() => navigateToSavedDetail(journal)}
-    >
-      <View style={styles.savedItemLeft}>
-        {journal.media && typeof journal.media === 'string' && journal.media.length > 0 && (
-          <Image source={{ uri: journal.media }} style={styles.journalThumb} />
-        )}
-        <View style={styles.journalInfo}>
-          <Text style={styles.journalHeadline} numberOfLines={2}>
-            {journal.headline || 'Untitled'}
-          </Text>
-          <Text style={styles.savedAuthor}>
-            by {journal.author_display_name || journal.author_handle || 'Unknown'}
-          </Text>
-          <Text style={styles.journalDate}>{formatDate(journal.local_date)}</Text>
-        </View>
-      </View>
-      <TouchableOpacity
-        style={styles.unsaveButton}
-        onPress={() => handleUnsave(journal.id)}
-      >
-        <Text style={styles.unsaveButtonText}>Unsave</Text>
-      </TouchableOpacity>
-    </TouchableOpacity>
-  );
-
-  const renderSavedTab = () => {
-    if (savedLoading && savedJournals.length === 0) {
-      return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000" />
-        </View>
-      );
-    }
-
-    if (savedJournals.length === 0) {
-      return (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyTitle}>No saved posts</Text>
-          <Text style={styles.emptySubtitle}>
-            Posts you save will appear here for easy access
-          </Text>
-        </View>
-      );
-    }
-
-    return (
-      <View style={styles.savedList}>
-        {savedJournals.map(renderSavedItem)}
-      </View>
-    );
-  };
-
   const renderGoalItem = (goal) => (
     <TouchableOpacity
       key={goal.id}
@@ -907,8 +835,6 @@ export default function ProfileScreen({ route, navigation }) {
     switch (activeTab) {
       case 'Journals':
         return renderJournalsTab();
-      case 'Saved':
-        return renderSavedTab();
       case 'Goals':
         return renderGoalsTab();
       case 'Insights':
@@ -944,13 +870,9 @@ export default function ProfileScreen({ route, navigation }) {
   if (!isOwnProfile && (profileError || !profile)) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Profile</Text>
-          <View style={styles.placeholder} />
-        </View>
+        <TouchableOpacity style={styles.backIconButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
         <View style={styles.errorState}>
           <Text style={styles.errorTitle}>{profileError || 'Profile not found'}</Text>
           <Text style={styles.errorSubtitle}>
@@ -963,25 +885,15 @@ export default function ProfileScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {isOwnProfile ? (
-        <View style={styles.ownProfileHeader}>
-          <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
-            <Text style={styles.editButton}>Edit</Text>
+      {!isOwnProfile && (
+        <>
+          <TouchableOpacity style={styles.backIconButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Friends')}>
-            <Text style={styles.settingsButton}>Friends</Text>
+          <TouchableOpacity style={styles.menuIconButton} onPress={() => setShowOptionsMenu(true)}>
+            <Ionicons name="ellipsis-horizontal" size={24} color="#000" />
           </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Profile</Text>
-          <TouchableOpacity onPress={handleBlock}>
-            <Text style={styles.blockButton}>Block</Text>
-          </TouchableOpacity>
-        </View>
+        </>
       )}
 
       <ScrollView
@@ -1041,6 +953,41 @@ export default function ProfileScreen({ route, navigation }) {
           </View>
         </Modal>
       )}
+
+      {/* Options Menu Modal */}
+      {!isOwnProfile && (
+        <Modal
+          visible={showOptionsMenu}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowOptionsMenu(false)}
+        >
+          <TouchableOpacity
+            style={styles.optionsOverlay}
+            activeOpacity={1}
+            onPress={() => setShowOptionsMenu(false)}
+          >
+            <View style={styles.optionsMenu}>
+              <TouchableOpacity
+                style={styles.optionItem}
+                onPress={() => {
+                  setShowOptionsMenu(false);
+                  handleBlock();
+                }}
+              >
+                <Ionicons name="ban-outline" size={20} color="#c00" />
+                <Text style={styles.optionTextDanger}>Block User</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.optionItemCancel}
+                onPress={() => setShowOptionsMenu(false)}
+              >
+                <Text style={styles.optionTextCancel}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -1050,57 +997,55 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  ownProfileHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  backIconButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 10,
+    padding: 8,
   },
-  editButton: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
+  menuIconButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    padding: 8,
   },
-  header: {
+  optionsOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  optionsMenu: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingTop: 8,
+    paddingBottom: 34,
+  },
+  optionItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingHorizontal: 24,
+    gap: 12,
   },
-  backButton: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
-    minWidth: 60,
-  },
-  headerTitle: {
-    fontSize: 14,
+  optionTextDanger: {
+    fontSize: 16,
     fontWeight: '500',
-    letterSpacing: 1,
-    color: '#000',
-  },
-  settingsButton: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
-    minWidth: 60,
-    textAlign: 'right',
-  },
-  blockButton: {
-    fontSize: 14,
-    fontWeight: '400',
     color: '#c00',
-    minWidth: 60,
-    textAlign: 'right',
   },
-  placeholder: {
-    minWidth: 60,
+  optionItemCancel: {
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    marginTop: 8,
+  },
+  optionTextCancel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#666',
   },
   scrollView: {
     flex: 1,
@@ -1217,12 +1162,33 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
   },
   editProfileButton: {
+    width: '48%',
     borderWidth: 1,
     borderColor: '#000',
-    paddingHorizontal: 24,
     paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   editProfileText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#000',
+    letterSpacing: 1,
+  },
+  profileButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignSelf: 'stretch',
+  },
+  savedButton: {
+    width: '48%',
+    borderWidth: 1,
+    borderColor: '#000',
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  savedButtonText: {
     fontSize: 12,
     fontWeight: '500',
     color: '#000',
@@ -1231,74 +1197,89 @@ const styles = StyleSheet.create({
 
   // Friend action section
   friendActionSection: {
-    marginTop: 4,
+    alignSelf: 'stretch',
   },
   friendActionButtons: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  singleActionButton: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#000',
+    paddingVertical: 10,
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
   },
   friendActionButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 4,
+    width: '48%',
+    borderWidth: 1,
+    borderColor: '#000',
+    paddingVertical: 10,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   friendActionButtonText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
-    color: '#fff',
+    color: '#000',
+    letterSpacing: 1,
   },
   pendingButton: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 4,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#000',
+    paddingVertical: 10,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   pendingButtonText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
-    color: '#666',
+    color: '#000',
+    letterSpacing: 1,
   },
   friendBadge: {
-    backgroundColor: '#e8f5e9',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 4,
+    width: '48%',
+    borderWidth: 1,
+    borderColor: '#000',
+    paddingVertical: 10,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   friendBadgeText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
-    color: '#2e7d32',
+    color: '#000',
+    letterSpacing: 1,
   },
   removeButton: {
+    width: '48%',
     borderWidth: 1,
-    borderColor: '#ddd',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 4,
+    borderColor: '#000',
+    paddingVertical: 10,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   removeButtonText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
-    color: '#666',
+    color: '#000',
+    letterSpacing: 1,
   },
   declineButton: {
+    width: '48%',
     borderWidth: 1,
-    borderColor: '#ddd',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 4,
+    borderColor: '#000',
+    paddingVertical: 10,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   declineButtonText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
-    color: '#666',
+    color: '#000',
+    letterSpacing: 1,
   },
   noteSection: {
     backgroundColor: '#f9f9f9',
@@ -1446,39 +1427,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     color: '#666',
-  },
-
-  // Saved Tab
-  savedList: {
-    paddingTop: 16,
-  },
-  savedItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
-  },
-  savedItemLeft: {
-    flexDirection: 'row',
-    flex: 1,
-    alignItems: 'center',
-  },
-  savedAuthor: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#666',
-    marginBottom: 2,
-  },
-  unsaveButton: {
-    padding: 8,
-  },
-  unsaveButtonText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#999',
   },
 
   // Goals Tab
