@@ -35,13 +35,10 @@ export default function GateScreen({ navigation }) {
   const {
     gateState,
     loading,
-    timeRemaining,
-    formatTimeRemaining,
     getNextResetTime,
     refreshState,
     startTracking,
     stopTracking,
-    isTracking,
   } = useGateState(user?.id, profile?.timezone);
 
   const {
@@ -139,13 +136,6 @@ export default function GateScreen({ navigation }) {
     setReportingJournal(journal);
     setReportModalVisible(true);
   }, []);
-
-  // Calculate timer color
-  const getTimerColor = () => {
-    if (timeRemaining <= 60) return '#c00';
-    if (timeRemaining <= 120) return '#f80';
-    return '#000';
-  };
 
   // Render filter chip
   const renderFilterChip = (option) => {
@@ -314,13 +304,6 @@ export default function GateScreen({ navigation }) {
   // FEED_UNLOCKED state - show feed inline
   return (
     <SafeAreaView style={styles.container}>
-      {/* Timer Bar */}
-      <View style={styles.timerBar}>
-        <Text style={[styles.timerText, { color: getTimerColor() }]}>
-          {formatTimeRemaining()} remaining
-        </Text>
-      </View>
-
       {/* Filter Chips */}
       <View style={styles.filterContainer}>
         <FlatList
@@ -364,14 +347,6 @@ export default function GateScreen({ navigation }) {
           ListEmptyComponent={renderEmpty}
         />
       )}
-
-      {/* Tracking Indicator */}
-      <View style={styles.trackingIndicator}>
-        <View style={[styles.trackingDot, isTracking && styles.trackingDotActive]} />
-        <Text style={styles.trackingText}>
-          {isTracking ? 'Timer running' : 'Timer paused'}
-        </Text>
-      </View>
 
       {/* Report Modal */}
       <ReportModal
@@ -508,18 +483,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   // Feed styles
-  timerBar: {
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  timerText: {
-    fontSize: 12,
-    fontWeight: '500',
-    letterSpacing: 1,
-    fontVariant: ['tabular-nums'],
-  },
   filterContainer: {
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
@@ -601,30 +564,5 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: '#999',
     textAlign: 'center',
-  },
-  trackingIndicator: {
-    position: 'absolute',
-    bottom: 24,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  trackingDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#ddd',
-  },
-  trackingDotActive: {
-    backgroundColor: '#0c0',
-  },
-  trackingText: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#999',
-    letterSpacing: 0.5,
   },
 });
