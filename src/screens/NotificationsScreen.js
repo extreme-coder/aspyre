@@ -10,6 +10,7 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../hooks/useNotifications';
@@ -194,12 +195,12 @@ export default function NotificationsScreen({ navigation }) {
       {(unreadCount > 0 || notifications.length > 0) && (
         <View style={styles.actionBar}>
           {unreadCount > 0 ? (
-            <TouchableOpacity onPress={handleMarkAllRead}>
-              <Text style={styles.actionButton}>Mark all read</Text>
+            <TouchableOpacity style={styles.actionButton} onPress={handleMarkAllRead}>
+              <Ionicons name="checkmark-done-outline" size={18} color="#666" />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity onPress={handleClearAll}>
-              <Text style={styles.actionButton}>Clear all</Text>
+            <TouchableOpacity style={styles.actionButton} onPress={handleClearAll}>
+              <Ionicons name="trash-outline" size={18} color="#666" />
             </TouchableOpacity>
           )}
         </View>
@@ -240,9 +241,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   actionButton: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    padding: 4,
   },
   loading: {
     flex: 1,

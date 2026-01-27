@@ -13,6 +13,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../contexts/AuthContext';
 import { useJournalEditor } from '../hooks/useJournalEditor';
@@ -350,8 +351,8 @@ export default function JournalEditorScreen({ navigation, route }) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.cancelButton}>Cancel</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+            <Ionicons name="close" size={24} color="#666" />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
             <Text style={styles.title}>Edit Post</Text>
@@ -379,7 +380,7 @@ export default function JournalEditorScreen({ navigation, route }) {
               <Image source={{ uri: mediaUri }} style={styles.heroImage} />
             ) : (
               <View style={styles.imagePlaceholder}>
-                <Text style={styles.imagePlaceholderText}>+ Add Photo</Text>
+                <Ionicons name="camera-outline" size={28} color="#999" />
               </View>
             )}
           </TouchableOpacity>

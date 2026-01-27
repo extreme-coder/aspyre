@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useGoals } from '../hooks/useGoals';
@@ -40,9 +41,11 @@ function GoalCard({ goal, onPress, onToggleArchive }) {
         style={styles.archiveButton}
         onPress={() => onToggleArchive(goal)}
       >
-        <Text style={styles.archiveButtonText}>
-          {goal.is_archived ? 'Restore' : 'Archive'}
-        </Text>
+        <Ionicons
+          name={goal.is_archived ? 'arrow-undo-outline' : 'archive-outline'}
+          size={18}
+          color="#666"
+        />
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -107,6 +110,7 @@ export default function GoalsListScreen({ navigation }) {
           <Text style={styles.errorTitle}>Failed to load goals</Text>
           <Text style={styles.errorMessage}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={fetchGoals}>
+            <Ionicons name="refresh-outline" size={18} color="#fff" />
             <Text style={styles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
         </View>
@@ -171,7 +175,7 @@ export default function GoalsListScreen({ navigation }) {
       {/* Floating Add Button */}
       {!showArchived && (
         <TouchableOpacity style={styles.fab} onPress={handleCreateGoal}>
-          <Text style={styles.fabText}>+</Text>
+          <Ionicons name="add" size={28} color="#fff" />
         </TouchableOpacity>
       )}
     </SafeAreaView>
@@ -207,16 +211,18 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   retryButton: {
-    borderWidth: 1,
-    borderColor: '#000',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#000',
     paddingVertical: 12,
-    paddingHorizontal: 32,
+    paddingHorizontal: 24,
   },
   retryButtonText: {
     fontSize: 12,
     fontWeight: '500',
     letterSpacing: 2,
-    color: '#000',
+    color: '#fff',
   },
   header: {
     flexDirection: 'row',
@@ -314,14 +320,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   archiveButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  archiveButtonText: {
-    fontSize: 10,
-    fontWeight: '500',
-    letterSpacing: 1,
-    color: '#999',
+    padding: 8,
   },
   emptyState: {
     flex: 1,
@@ -369,11 +368,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-  },
-  fabText: {
-    fontSize: 28,
-    fontWeight: '300',
-    color: '#fff',
-    marginTop: -2,
   },
 });

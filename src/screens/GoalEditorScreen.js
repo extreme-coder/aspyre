@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useGoals } from '../hooks/useGoals';
 
@@ -147,11 +148,11 @@ export default function GoalEditorScreen({ navigation, route }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.cancelButton}>Cancel</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+          <Ionicons name="close" size={24} color="#666" />
         </TouchableOpacity>
         <Text style={styles.title}>{isEditing ? 'Edit Goal' : 'New Goal'}</Text>
-        <TouchableOpacity onPress={handleSave} disabled={saving}>
+        <TouchableOpacity onPress={handleSave} disabled={saving} style={styles.headerButton}>
           {saving ? (
             <ActivityIndicator size="small" color="#000" />
           ) : (
@@ -234,6 +235,7 @@ export default function GoalEditorScreen({ navigation, route }) {
           {/* Delete Button (only when editing) */}
           {isEditing && (
             <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+              <Ionicons name="trash-outline" size={18} color="#c00" />
               <Text style={styles.deleteButtonText}>Delete Goal</Text>
             </TouchableOpacity>
           )}
@@ -262,10 +264,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  cancelButton: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
+  headerButton: {
+    width: 40,
+    alignItems: 'center',
   },
   title: {
     fontSize: 14,
@@ -340,6 +341,10 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
     borderWidth: 1,
     borderColor: '#c00',
     paddingVertical: 16,
@@ -347,7 +352,6 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     color: '#c00',
-    textAlign: 'center',
     fontSize: 12,
     fontWeight: '500',
     letterSpacing: 2,

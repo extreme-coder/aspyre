@@ -7,6 +7,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../config/supabase';
 
 const GOAL_TYPE_LABELS = {
@@ -272,7 +273,7 @@ export default function FeedCard({
               onPress={handleMoreOptions}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Text style={styles.moreButtonText}>...</Text>
+              <Ionicons name="ellipsis-horizontal" size={18} color="#999" />
             </TouchableOpacity>
           </View>
         </View>
@@ -319,14 +320,11 @@ export default function FeedCard({
             onPress={handleKudosToggle}
             disabled={kudosLoading}
           >
-            <Text
-              style={[
-                styles.actionText,
-                viewer_has_kudos && styles.actionTextActive,
-              ]}
-            >
-              {viewer_has_kudos ? 'Kudos!' : 'Kudos'}
-            </Text>
+            <Ionicons
+              name={viewer_has_kudos ? 'heart' : 'heart-outline'}
+              size={20}
+              color={viewer_has_kudos ? '#000' : '#666'}
+            />
             {parseInt(kudos_count) > 0 && (
               <Text
                 style={[
@@ -344,14 +342,11 @@ export default function FeedCard({
             onPress={handleSaveToggle}
             disabled={saveLoading}
           >
-            <Text
-              style={[
-                styles.actionText,
-                viewer_has_saved && styles.actionTextActive,
-              ]}
-            >
-              {viewer_has_saved ? 'Saved' : 'Save'}
-            </Text>
+            <Ionicons
+              name={viewer_has_saved ? 'bookmark' : 'bookmark-outline'}
+              size={20}
+              color={viewer_has_saved ? '#000' : '#666'}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -446,12 +441,6 @@ const styles = StyleSheet.create({
   moreButton: {
     padding: 4,
   },
-  moreButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#999',
-    letterSpacing: 2,
-  },
   chipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -509,19 +498,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  actionText: {
+  actionCount: {
     fontSize: 12,
     fontWeight: '500',
     color: '#666',
-    letterSpacing: 0.5,
-  },
-  actionTextActive: {
-    color: '#000',
-  },
-  actionCount: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#999',
   },
   actionCountActive: {
     color: '#000',

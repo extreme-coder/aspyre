@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Switch,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { useAuth } from '../contexts/AuthContext';
@@ -444,11 +445,11 @@ export default function SettingsScreen({ navigation }) {
                     )}
                   </View>
                   <View style={styles.locationActions}>
-                    <TouchableOpacity onPress={handleRefreshLocation}>
-                      <Text style={styles.locationActionText}>Refresh</Text>
+                    <TouchableOpacity onPress={handleRefreshLocation} style={styles.locationActionButton}>
+                      <Ionicons name="refresh-outline" size={18} color="#666" />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={handleSwitchToManual}>
-                      <Text style={styles.locationActionText}>Edit</Text>
+                    <TouchableOpacity onPress={handleSwitchToManual} style={styles.locationActionButton}>
+                      <Ionicons name="pencil-outline" size={18} color="#666" />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -479,6 +480,7 @@ export default function SettingsScreen({ navigation }) {
 
                   {!manualLocationMode && (
                     <TouchableOpacity onPress={handleRefreshLocation} style={styles.detectButton}>
+                      <Ionicons name="location-outline" size={18} color="#000" />
                       <Text style={styles.detectButtonText}>Detect My Location</Text>
                     </TouchableOpacity>
                   )}
@@ -692,24 +694,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 16,
   },
-  locationActionText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
-    letterSpacing: 1,
+  locationActionButton: {
+    padding: 4,
   },
   detectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
     borderWidth: 1,
     borderColor: '#ddd',
     paddingVertical: 12,
-    alignItems: 'center',
     marginTop: 8,
   },
   detectButtonText: {
     fontSize: 12,
     fontWeight: '500',
     letterSpacing: 1,
-    color: '#666',
+    color: '#000',
   },
   saveButton: {
     backgroundColor: '#000',

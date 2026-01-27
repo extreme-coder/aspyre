@@ -13,6 +13,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../hooks/useProfile';
@@ -138,11 +139,11 @@ export default function EditProfileScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.cancelButton}>Cancel</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+            <Ionicons name="close" size={24} color="#666" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Profile</Text>
-          <View style={styles.placeholder} />
+          <View style={styles.headerButton} />
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#000" />
@@ -158,11 +159,11 @@ export default function EditProfileScreen({ navigation }) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Text style={styles.cancelButton}>Cancel</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+            <Ionicons name="close" size={24} color="#666" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Profile</Text>
-          <TouchableOpacity onPress={handleSave} disabled={saving}>
+          <TouchableOpacity onPress={handleSave} disabled={saving} style={styles.headerButton}>
             {saving ? (
               <ActivityIndicator size="small" color="#000" />
             ) : (
@@ -235,7 +236,7 @@ export default function EditProfileScreen({ navigation }) {
             <Text style={styles.noteText}>
               For privacy and location settings, go to Settings.
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Settings' })}>
+            <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
               <Text style={styles.noteLink}>Open Settings</Text>
             </TouchableOpacity>
           </View>
@@ -262,11 +263,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  cancelButton: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
-    minWidth: 50,
+  headerButton: {
+    width: 50,
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 14,
@@ -278,11 +277,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#000',
-    minWidth: 50,
-    textAlign: 'right',
-  },
-  placeholder: {
-    minWidth: 50,
   },
   loadingContainer: {
     flex: 1,

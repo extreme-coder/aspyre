@@ -13,6 +13,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
@@ -759,7 +760,11 @@ export default function JournalComposeScreen({ navigation }) {
               }
             }}
           >
-            <Text style={styles.cancelButton}>{isEditing ? 'Cancel' : ''}</Text>
+            {isEditing ? (
+              <Ionicons name="close" size={24} color="#666" />
+            ) : (
+              <View style={{ width: 24 }} />
+            )}
           </TouchableOpacity>
           <Text style={styles.dateText}>{formatDateForDisplay(localDate)}</Text>
           <TouchableOpacity onPress={handleSave} disabled={saving || uploadingImage}>
@@ -839,8 +844,7 @@ export default function JournalComposeScreen({ navigation }) {
               <Image source={{ uri: mediaUri }} style={styles.heroImage} />
             ) : (
               <View style={styles.imagePickerPlaceholder}>
-                <Text style={styles.imagePickerIcon}>+</Text>
-                <Text style={styles.imagePickerText}>Add Photo</Text>
+                <Ionicons name="camera-outline" size={32} color="#999" />
                 <Text style={styles.imagePickerHint}>Show your progress</Text>
               </View>
             )}
@@ -848,7 +852,8 @@ export default function JournalComposeScreen({ navigation }) {
 
           {mediaUri && (
             <TouchableOpacity style={styles.changeImageButton} onPress={showImageOptions}>
-              <Text style={styles.changeImageText}>Change Photo</Text>
+              <Ionicons name="camera-outline" size={16} color="#666" />
+              <Text style={styles.changeImageText}>Change</Text>
             </TouchableOpacity>
           )}
 

@@ -11,6 +11,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../config/supabase';
 
 const REPORT_REASONS = [
@@ -91,7 +92,7 @@ export default function ReportModal({
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Cancel</Text>
+            <Ionicons name="close" size={24} color="#666" />
           </TouchableOpacity>
           <Text style={styles.title}>Report Post</Text>
           <TouchableOpacity
