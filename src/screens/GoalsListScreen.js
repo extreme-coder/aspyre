@@ -230,8 +230,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingVertical: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   title: {
     fontSize: 14,

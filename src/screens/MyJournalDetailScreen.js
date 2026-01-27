@@ -542,8 +542,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   backButton: {
     fontSize: 14,
