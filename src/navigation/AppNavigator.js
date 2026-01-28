@@ -13,10 +13,21 @@ import { useProfile } from '../hooks/useProfile';
 import { useNotifications } from '../hooks/useNotifications';
 import { UnsavedChangesProvider, useUnsavedChanges } from '../contexts/UnsavedChangesContext';
 
-// Auth screens
+// Auth screens (legacy - for returning users who want to login directly)
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+
+// Onboarding screens
+import OnboardingWelcomeScreen from '../screens/onboarding/OnboardingWelcomeScreen';
+import OnboardingTourScreen from '../screens/onboarding/OnboardingTourScreen';
+import OnboardingAuthScreen from '../screens/onboarding/OnboardingAuthScreen';
+import OnboardingNameScreen from '../screens/onboarding/OnboardingNameScreen';
+import OnboardingLocationScreen from '../screens/onboarding/OnboardingLocationScreen';
+import OnboardingPhotoScreen from '../screens/onboarding/OnboardingPhotoScreen';
+import OnboardingGoalsScreen from '../screens/onboarding/OnboardingGoalsScreen';
+
+import { onboardingColors } from '../constants/onboardingTheme';
 
 // Main app screens
 import GateScreen from '../screens/GateScreen';
@@ -37,7 +48,7 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const GoalsStack = createNativeStackNavigator();
 
-// Auth Stack
+// Auth Stack (legacy - for returning users)
 function AuthStack() {
   return (
     <Stack.Navigator
@@ -49,6 +60,30 @@ function AuthStack() {
     >
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// Onboarding Stack (for new users)
+function OnboardingStack({ initialRouteName = 'OnboardingWelcome' }) {
+  return (
+    <Stack.Navigator
+      initialRouteName={initialRouteName}
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: onboardingColors.background },
+        animation: 'slide_from_right',
+      }}
+    >
+      <Stack.Screen name="OnboardingWelcome" component={OnboardingWelcomeScreen} />
+      <Stack.Screen name="OnboardingTour" component={OnboardingTourScreen} />
+      <Stack.Screen name="OnboardingAuth" component={OnboardingAuthScreen} />
+      <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
+      <Stack.Screen name="OnboardingLocation" component={OnboardingLocationScreen} />
+      <Stack.Screen name="OnboardingPhoto" component={OnboardingPhotoScreen} />
+      <Stack.Screen name="OnboardingGoals" component={OnboardingGoalsScreen} />
+      {/* Include ForgotPassword for sign-in flow */}
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
     </Stack.Navigator>
   );
@@ -261,14 +296,20 @@ function AppStack() {
         component={EditProfileScreen}
         options={{ animation: 'slide_from_right' }}
       />
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
     </Stack.Navigator>
   );
 }
 
 export default function AppNavigator({ onReady }) {
-  const { user, loading } = useAuth();
+  const { user, loading, profile } = useAuth();
 
-  if (loading) {
+  // Show loading while auth is loading OR while profile is being fetched
+  if (loading || (user && profile === null)) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000" />
@@ -276,10 +317,23 @@ export default function AppNavigator({ onReady }) {
     );
   }
 
+  // Determine navigation state
+  // - No user → OnboardingStack (start at welcome for new users)
+  // - User exists but onboarding incomplete → OnboardingStack (resume at name)
+  // - User exists and onboarding complete → AppStack
+  const needsOnboarding = user && profile && !profile.onboarding_complete;
+  const isNewUser = user && !profile; // Profile not yet created
+
   return (
     <UnsavedChangesProvider>
       <NavigationContainer ref={navigationRef} onReady={onReady}>
-        {user ? <AppStack /> : <AuthStack />}
+        {!user ? (
+          <OnboardingStack />
+        ) : needsOnboarding || isNewUser ? (
+          <OnboardingStack initialRouteName="OnboardingName" />
+        ) : (
+          <AppStack />
+        )}
       </NavigationContainer>
     </UnsavedChangesProvider>
   );
