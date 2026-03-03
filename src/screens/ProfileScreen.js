@@ -1084,8 +1084,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 32,
     paddingHorizontal: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   avatarContainer: {
     marginBottom: 16,
