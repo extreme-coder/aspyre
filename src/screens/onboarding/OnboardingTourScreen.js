@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { useAuth } from '../../contexts/AuthContext';
 import { onboardingColors, onboardingTypography, onboardingStyles } from '../../constants/onboardingTheme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -52,7 +51,6 @@ const TOUR_SLIDES = [
 export default function OnboardingTourScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const scrollViewRef = useRef(null);
-  const { signInWithApple } = useAuth();
   const [activeSlide, setActiveSlide] = useState(0);
   const [appleAuthAvailable, setAppleAuthAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -85,14 +83,8 @@ export default function OnboardingTourScreen({ navigation }) {
     setActiveSlide(slideIndex);
   };
 
-  const handleAppleSignIn = async () => {
-    setLoading(true);
-    const { error } = await signInWithApple();
-    setLoading(false);
-
-    if (error && error.message !== 'Sign in was cancelled') {
-      Alert.alert('Error', error.message);
-    }
+  const handleAppleSignIn = () => {
+    Alert.alert('Coming Soon', 'Sign in with Apple will be available soon!');
   };
 
   const handleCreateAccount = () => {

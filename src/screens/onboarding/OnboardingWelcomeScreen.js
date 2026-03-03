@@ -14,7 +14,6 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { useAuth } from '../../contexts/AuthContext';
 import { onboardingColors, onboardingTypography } from '../../constants/onboardingTheme';
 
 const backgroundImage = require('../../../assets/onboarding-background.jpg');
@@ -22,7 +21,6 @@ const wordmarkWhite = require('../../../assets/wordmark_white.png');
 
 export default function OnboardingWelcomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
-  const { signInWithApple } = useAuth();
   const [appleAuthAvailable, setAppleAuthAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -40,15 +38,8 @@ export default function OnboardingWelcomeScreen({ navigation }) {
     navigation.navigate('OnboardingTour');
   };
 
-  const handleAppleSignIn = async () => {
-    setLoading(true);
-    const { error } = await signInWithApple();
-    setLoading(false);
-
-    if (error && error.message !== 'Sign in was cancelled') {
-      Alert.alert('Error', error.message);
-    }
-    // If successful, AuthContext will handle navigation
+  const handleAppleSignIn = () => {
+    Alert.alert('Coming Soon', 'Sign in with Apple will be available soon!');
   };
 
   const handleCreateAccount = () => {

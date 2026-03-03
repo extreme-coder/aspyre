@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { Platform } from 'react-native';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Crypto from 'expo-crypto';
 import { supabase } from '../config/supabase';
 import {
   registerForPushNotificationsAsync,
@@ -37,7 +40,17 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
+      // Handle invalid refresh token by signing out
+      if (error?.message?.includes('Refresh Token') || error?.code === 'invalid_grant') {
+        console.warn('Invalid session, signing out:', error.message);
+        await supabase.auth.signOut();
+        setSession(null);
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -49,6 +62,13 @@ export const AuthProvider = ({ children }) => {
           await savePushToken(session.user.id, token);
         }
       }
+      setLoading(false);
+    }).catch(async (err) => {
+      // Handle any auth errors by clearing session
+      console.warn('Auth error, clearing session:', err.message);
+      await supabase.auth.signOut();
+      setSession(null);
+      setUser(null);
       setLoading(false);
     });
 
@@ -98,6 +118,68 @@ export const AuthProvider = ({ children }) => {
     return { data, error };
   };
 
+  const signInWithApple = async () => {
+    if (Platform.OS !== 'ios') {
+      return { data: null, error: { message: 'Apple Sign In is only available on iOS' } };
+    }
+
+    try {
+      // Generate a random nonce for security
+      const rawNonce = Crypto.getRandomBytes(16)
+        .map((byte) => byte.toString(16).padStart(2, '0'))
+        .join('');
+      const hashedNonce = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        rawNonce
+      );
+
+      // Request Apple credential
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+        nonce: hashedNonce,
+      });
+
+      if (!credential.identityToken) {
+        return { data: null, error: { message: 'No identity token received from Apple' } };
+      }
+
+      // Sign in with Supabase using the Apple ID token
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: 'apple',
+        token: credential.identityToken,
+        nonce: rawNonce,
+      });
+
+      if (error) {
+        return { data: null, error };
+      }
+
+      // If Apple provided the user's name (only on first sign-in), update the profile
+      if (credential.fullName?.givenName || credential.fullName?.familyName) {
+        const displayName = [credential.fullName.givenName, credential.fullName.familyName]
+          .filter(Boolean)
+          .join(' ');
+
+        if (displayName && data.user) {
+          await supabase
+            .from('profiles')
+            .update({ display_name: displayName })
+            .eq('id', data.user.id);
+        }
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      if (err.code === 'ERR_REQUEST_CANCELED') {
+        return { data: null, error: { message: 'Sign in was cancelled' } };
+      }
+      return { data: null, error: { message: err.message || 'Apple Sign In failed' } };
+    }
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     return { error };
@@ -144,6 +226,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     signUp,
     signIn,
+    signInWithApple,
     signOut,
     resetPassword,
     updatePassword,

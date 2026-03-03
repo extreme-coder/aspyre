@@ -12,6 +12,8 @@ export default {
     },
     ios: {
       supportsTablet: true,
+      bundleIdentifier: "com.aspyre.app",
+      usesAppleSignIn: true,
       infoPlist: {
         NSCameraUsageDescription: "This app uses the camera to let you add photos to your journal entries.",
         NSPhotoLibraryUsageDescription: "This app accesses your photos to let you add images to your journal entries."
@@ -23,7 +25,8 @@ export default {
       }
     },
     plugins: [
-      "expo-notifications"
+      "expo-notifications",
+      "expo-apple-authentication"
     ],
     extra: {
       eas: {

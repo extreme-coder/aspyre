@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function SignupScreen({ navigation }) {
@@ -17,7 +18,18 @@ export default function SignupScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [appleAuthAvailable, setAppleAuthAvailable] = useState(false);
   const { signUp } = useAuth();
+
+  useEffect(() => {
+    const checkAppleAuth = async () => {
+      if (Platform.OS === 'ios') {
+        const isAvailable = await AppleAuthentication.isAvailableAsync();
+        setAppleAuthAvailable(isAvailable);
+      }
+    };
+    checkAppleAuth();
+  }, []);
 
   const handleSignup = async () => {
     if (!email || !password || !confirmPassword) {
@@ -48,6 +60,10 @@ export default function SignupScreen({ navigation }) {
         [{ text: 'OK', onPress: () => navigation.navigate('Login') }]
       );
     }
+  };
+
+  const handleAppleSignIn = () => {
+    Alert.alert('Coming Soon', 'Sign in with Apple will be available soon!');
   };
 
   return (
@@ -101,6 +117,24 @@ export default function SignupScreen({ navigation }) {
               <Text style={styles.buttonText}>Create Account</Text>
             )}
           </TouchableOpacity>
+
+          {appleAuthAvailable && (
+            <>
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>or</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
+                buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                cornerRadius={0}
+                style={styles.appleButton}
+                onPress={handleAppleSignIn}
+              />
+            </>
+          )}
         </View>
 
         <TouchableOpacity
@@ -158,6 +192,27 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 2,
     fontWeight: '500',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ddd',
+  },
+  dividerText: {
+    paddingHorizontal: 16,
+    fontSize: 12,
+    color: '#999',
+    letterSpacing: 1,
+  },
+  appleButton: {
+    width: '100%',
+    height: 48,
+    marginTop: 16,
   },
   link: {
     marginTop: 40,
