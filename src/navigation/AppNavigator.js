@@ -43,6 +43,7 @@ import JournalEditorScreen from '../screens/JournalEditorScreen';
 import SavedScreen from '../screens/SavedScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
+import DiscoverScreen from '../screens/DiscoverScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -299,6 +300,11 @@ function AppStack() {
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="Discover"
+        component={DiscoverScreen}
         options={{ animation: 'slide_from_right' }}
       />
     </Stack.Navigator>
