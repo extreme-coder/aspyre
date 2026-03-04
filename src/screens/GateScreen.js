@@ -20,6 +20,7 @@ import { useGoals } from '../hooks/useGoals';
 import { useImpressions } from '../hooks/useImpressions';
 import FeedCard from '../components/FeedCard';
 import ReportModal from '../components/ReportModal';
+import { Ionicons } from '@expo/vector-icons';
 
 const FILTER_OPTIONS = [
   { key: FeedFilter.DISCOVER, label: 'Discover' },
@@ -198,36 +199,59 @@ export default function GateScreen({ navigation }) {
   const renderEmpty = () => {
     if (feedLoading) return null;
 
+    let icon = 'earth-outline';
     let message = 'No posts to show';
     let subtitle = '';
+    let buttonText = '';
+    let onButtonPress = null;
 
     switch (filter) {
       case FeedFilter.DISCOVER:
+        icon = 'compass-outline';
         message = 'Nothing to discover yet';
-        subtitle = 'Check back soon as more people post';
+        subtitle = 'Find people to follow and see their posts here';
+        buttonText = 'Discover People';
+        onButtonPress = () => navigation.navigate('Discover');
         break;
       case FeedFilter.FRIENDS:
+        icon = 'people-outline';
         message = 'No posts from friends yet';
-        subtitle = 'Add friends to see their posts here';
+        subtitle = 'Connect with people to see their updates';
+        buttonText = 'Find Friends';
+        onButtonPress = () => navigation.navigate('Discover');
         break;
       case FeedFilter.NEARBY:
+        icon = 'location-outline';
         message = 'No nearby posts';
         subtitle = 'No one near you has posted recently';
         break;
       case FeedFilter.SAVED:
+        icon = 'bookmark-outline';
         message = 'No saved posts';
         subtitle = 'Posts you save will appear here';
         break;
       case FeedFilter.SIMILAR_GOALS:
+        icon = 'flag-outline';
         message = 'No similar goal posts';
-        subtitle = 'Add goals to see posts from people with similar interests';
+        subtitle = 'Create goals to find people with shared interests';
+        buttonText = 'Create Goal';
+        onButtonPress = () => navigation.navigate('Goals', {
+          screen: 'GoalEditor',
+          params: { goal: null },
+        });
         break;
     }
 
     return (
       <View style={styles.emptyState}>
+        <Ionicons name={icon} size={48} color="#ccc" style={styles.emptyStateIcon} />
         <Text style={styles.emptyStateTitle}>{message}</Text>
         {subtitle && <Text style={styles.emptyStateSubtitle}>{subtitle}</Text>}
+        {buttonText && onButtonPress && (
+          <TouchableOpacity style={styles.emptyStateButton} onPress={onButtonPress}>
+            <Text style={styles.emptyStateButtonText}>{buttonText}</Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   };
@@ -553,6 +577,9 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
     alignItems: 'center',
   },
+  emptyStateIcon: {
+    marginBottom: 16,
+  },
   emptyStateTitle: {
     fontSize: 16,
     fontWeight: '400',
@@ -564,5 +591,18 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: '#999',
     textAlign: 'center',
+    paddingHorizontal: 32,
+  },
+  emptyStateButton: {
+    marginTop: 20,
+    backgroundColor: '#000',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  emptyStateButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: 1,
   },
 });

@@ -10,6 +10,7 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useFriends } from '../hooks/useFriends';
@@ -271,10 +272,17 @@ export default function FriendsScreen({ navigation, route }) {
     if (friends.length === 0) {
       return (
         <View style={styles.emptyState}>
+          <Ionicons name="people-outline" size={48} color="#ccc" style={styles.emptyIcon} />
           <Text style={styles.emptyTitle}>No friends yet</Text>
           <Text style={styles.emptySubtitle}>
-            Find people to connect with in the feed
+            Discover people with similar goals and interests
           </Text>
+          <TouchableOpacity
+            style={styles.emptyButton}
+            onPress={() => navigation.navigate('Discover')}
+          >
+            <Text style={styles.emptyButtonText}>Discover People</Text>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -289,9 +297,10 @@ export default function FriendsScreen({ navigation, route }) {
     if (!hasIncoming && !hasOutgoing) {
       return (
         <View style={styles.emptyState}>
+          <Ionicons name="mail-outline" size={48} color="#ccc" style={styles.emptyIcon} />
           <Text style={styles.emptyTitle}>No pending requests</Text>
           <Text style={styles.emptySubtitle}>
-            Friend requests you send or receive will appear here
+            When you send friend requests or receive them, they'll show up here
           </Text>
         </View>
       );
@@ -323,7 +332,9 @@ export default function FriendsScreen({ navigation, route }) {
             <Text style={styles.backButton}>Back</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Friends</Text>
-          <View style={styles.placeholder} />
+          <TouchableOpacity onPress={() => navigation.navigate('Discover')}>
+            <Ionicons name="search-outline" size={20} color="#000" />
+          </TouchableOpacity>
         </View>
         <View style={styles.loading}>
           <ActivityIndicator size="large" color="#000" />
@@ -339,7 +350,9 @@ export default function FriendsScreen({ navigation, route }) {
           <Text style={styles.backButton}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Friends</Text>
-        <View style={styles.placeholder} />
+        <TouchableOpacity onPress={() => navigation.navigate('Discover')}>
+          <Ionicons name="search-outline" size={20} color="#000" />
+        </TouchableOpacity>
       </View>
 
       {/* Tabs */}
@@ -549,6 +562,9 @@ const styles = StyleSheet.create({
     padding: 48,
     alignItems: 'center',
   },
+  emptyIcon: {
+    marginBottom: 16,
+  },
   emptyTitle: {
     fontSize: 16,
     fontWeight: '500',
@@ -560,5 +576,18 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: '#666',
     textAlign: 'center',
+    paddingHorizontal: 16,
+  },
+  emptyButton: {
+    marginTop: 20,
+    backgroundColor: '#000',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  emptyButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: 1,
   },
 });
