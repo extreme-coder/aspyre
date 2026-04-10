@@ -10,7 +10,6 @@ export const navigationRef = createNavigationContainerRef();
 
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../hooks/useProfile';
-import { useNotifications } from '../hooks/useNotifications';
 import { UnsavedChangesProvider, useUnsavedChanges } from '../contexts/UnsavedChangesContext';
 
 // Auth screens (legacy - for returning users who want to login directly)
@@ -18,13 +17,10 @@ import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 
-// Onboarding screens
+// Onboarding screens (simplified flow: Welcome → Auth → Name → Goals)
 import OnboardingWelcomeScreen from '../screens/onboarding/OnboardingWelcomeScreen';
-import OnboardingTourScreen from '../screens/onboarding/OnboardingTourScreen';
 import OnboardingAuthScreen from '../screens/onboarding/OnboardingAuthScreen';
 import OnboardingNameScreen from '../screens/onboarding/OnboardingNameScreen';
-import OnboardingLocationScreen from '../screens/onboarding/OnboardingLocationScreen';
-import OnboardingPhotoScreen from '../screens/onboarding/OnboardingPhotoScreen';
 import OnboardingGoalsScreen from '../screens/onboarding/OnboardingGoalsScreen';
 
 import { onboardingColors } from '../constants/onboardingTheme';
@@ -44,10 +40,10 @@ import SavedScreen from '../screens/SavedScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
+import DevToolsScreen from '../screens/DevToolsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-const GoalsStack = createNativeStackNavigator();
 
 // Auth Stack (legacy - for returning users)
 function AuthStack() {
@@ -66,7 +62,7 @@ function AuthStack() {
   );
 }
 
-// Onboarding Stack (for new users)
+// Onboarding Stack (simplified: Welcome → Auth → Name → Goals)
 function OnboardingStack({ initialRouteName = 'OnboardingWelcome' }) {
   return (
     <Stack.Navigator
@@ -78,31 +74,12 @@ function OnboardingStack({ initialRouteName = 'OnboardingWelcome' }) {
       }}
     >
       <Stack.Screen name="OnboardingWelcome" component={OnboardingWelcomeScreen} />
-      <Stack.Screen name="OnboardingTour" component={OnboardingTourScreen} />
       <Stack.Screen name="OnboardingAuth" component={OnboardingAuthScreen} />
       <Stack.Screen name="OnboardingName" component={OnboardingNameScreen} />
-      <Stack.Screen name="OnboardingLocation" component={OnboardingLocationScreen} />
-      <Stack.Screen name="OnboardingPhoto" component={OnboardingPhotoScreen} />
       <Stack.Screen name="OnboardingGoals" component={OnboardingGoalsScreen} />
       {/* Include ForgotPassword for sign-in flow */}
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
     </Stack.Navigator>
-  );
-}
-
-// Goals Stack (nested)
-function GoalsStackNavigator() {
-  return (
-    <GoalsStack.Navigator
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { backgroundColor: '#fff' },
-        animation: 'slide_from_right',
-      }}
-    >
-      <GoalsStack.Screen name="GoalsList" component={GoalsListScreen} />
-      <GoalsStack.Screen name="GoalEditor" component={GoalEditorScreen} />
-    </GoalsStack.Navigator>
   );
 }
 
@@ -126,29 +103,6 @@ function AvatarTabIcon({ focused }) {
           {profile?.display_name?.charAt(0)?.toUpperCase() || '?'}
         </Text>
       </View>
-    </View>
-  );
-}
-
-// Notification icon with badge
-function NotificationTabIcon({ focused, color }) {
-  const { user } = useAuth();
-  const { unreadCount } = useNotifications(user?.id);
-
-  return (
-    <View style={styles.notificationIconContainer}>
-      <Ionicons
-        name={focused ? 'notifications' : 'notifications-outline'}
-        size={24}
-        color={color}
-      />
-      {unreadCount > 0 && (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>
-            {unreadCount > 99 ? '99+' : unreadCount}
-          </Text>
-        </View>
-      )}
     </View>
   );
 }
@@ -203,20 +157,6 @@ function MainTabs() {
         listeners={({ navigation }) => createUnsavedChangesListener('Home', navigation)}
       />
       <Tab.Screen
-        name="Goals"
-        component={GoalsStackNavigator}
-        options={{
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'flag' : 'flag-outline'}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-        listeners={({ navigation }) => createUnsavedChangesListener('Goals', navigation)}
-      />
-      <Tab.Screen
         name="Post"
         component={JournalComposeScreen}
         options={{
@@ -231,22 +171,12 @@ function MainTabs() {
         listeners={({ navigation }) => createUnsavedChangesListener('Post', navigation)}
       />
       <Tab.Screen
-        name="Notifications"
-        component={NotificationsScreen}
-        options={{
-          tabBarIcon: ({ focused, color }) => (
-            <NotificationTabIcon focused={focused} color={color} />
-          ),
-        }}
-        listeners={({ navigation }) => createUnsavedChangesListener('Notifications', navigation)}
-      />
-      <Tab.Screen
-        name="Account"
+        name="Me"
         component={ProfileScreen}
         options={{
           tabBarIcon: ({ focused }) => <AvatarTabIcon focused={focused} />,
         }}
-        listeners={({ navigation }) => createUnsavedChangesListener('Account', navigation)}
+        listeners={({ navigation }) => createUnsavedChangesListener('Me', navigation)}
       />
     </Tab.Navigator>
   );
@@ -305,6 +235,27 @@ function AppStack() {
       <Stack.Screen
         name="Discover"
         component={DiscoverScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="GoalsList"
+        component={GoalsListScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      <Stack.Screen
+        name="GoalEditor"
+        component={GoalEditorScreen}
+        options={{ animation: 'slide_from_right' }}
+      />
+      {/* Dev Tools - only accessible in development */}
+      <Stack.Screen
+        name="DevTools"
+        component={DevToolsScreen}
         options={{ animation: 'slide_from_right' }}
       />
     </Stack.Navigator>
@@ -391,25 +342,5 @@ const styles = StyleSheet.create({
   },
   avatarInitialFocused: {
     color: '#000',
-  },
-  notificationIconContainer: {
-    position: 'relative',
-  },
-  badge: {
-    position: 'absolute',
-    top: -4,
-    right: -8,
-    backgroundColor: '#000',
-    borderRadius: 10,
-    minWidth: 16,
-    height: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 4,
-  },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#fff',
   },
 });

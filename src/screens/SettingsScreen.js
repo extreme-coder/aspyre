@@ -261,6 +261,15 @@ export default function SettingsScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.backButton}>Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Settings</Text>
+        <View style={styles.placeholder} />
+      </View>
+
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         {/* Profile Section */}
         <View style={styles.section}>
@@ -510,6 +519,17 @@ export default function SettingsScreen({ navigation }) {
           <Text style={styles.logoutButtonText}>Sign Out</Text>
         </TouchableOpacity>
 
+        {/* Dev Tools - only in development */}
+        {__DEV__ && (
+          <TouchableOpacity
+            style={styles.devToolsButton}
+            onPress={() => navigation.navigate('DevTools')}
+          >
+            <Ionicons name="construct-outline" size={16} color="#666" />
+            <Text style={styles.devToolsButtonText}>Developer Tools</Text>
+          </TouchableOpacity>
+        )}
+
         <View style={styles.footer}>
           <Text style={styles.footerText}>Aspyre v1.0</Text>
         </View>
@@ -550,7 +570,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  backButton: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#666',
+    minWidth: 50,
   },
   placeholder: {
     minWidth: 50,
@@ -810,6 +838,22 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   unblockButtonText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#666',
+  },
+  devToolsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderStyle: 'dashed',
+    paddingVertical: 14,
+    marginBottom: 16,
+  },
+  devToolsButtonText: {
     fontSize: 12,
     fontWeight: '500',
     color: '#666',
