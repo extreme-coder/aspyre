@@ -9,6 +9,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Image,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 
 const wordmarkBlack = require('../../../assets/wordmark_black.png');
@@ -16,23 +18,41 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { onboardingColors, onboardingTypography } from '../../constants/onboardingTheme';
 import OnboardingProgress from '../../components/OnboardingProgress';
 import OnboardingNextButton from '../../components/OnboardingNextButton';
+import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../config/supabase';
 
 export default function OnboardingNameScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
+  const { user } = useAuth();
 
   // Get any pre-filled data from previous screens or context
   const initialName = route.params?.displayName || '';
   const [displayName, setDisplayName] = useState(initialName);
+  const [saving, setSaving] = useState(false);
 
   const isValid = displayName.trim().length >= 2;
 
-  const handleNext = () => {
-    if (!isValid) return;
+  const handleNext = async () => {
+    if (!isValid || saving) return;
 
-    // Pass the display name to the next screen
-    navigation.navigate('OnboardingLocation', {
-      displayName: displayName.trim(),
-    });
+    setSaving(true);
+
+    try {
+      // Update profile with display name
+      const { error } = await supabase
+        .from('profiles')
+        .update({ display_name: displayName.trim() })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Navigate to goals (simplified flow)
+      navigation.navigate('OnboardingGoals');
+    } catch (err) {
+      Alert.alert('Error', 'Could not save your name. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

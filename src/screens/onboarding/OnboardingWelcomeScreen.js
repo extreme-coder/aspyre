@@ -34,8 +34,8 @@ export default function OnboardingWelcomeScreen({ navigation }) {
     checkAppleAuth();
   }, []);
 
-  const handleTour = () => {
-    navigation.navigate('OnboardingTour');
+  const handleGetStarted = () => {
+    navigation.navigate('OnboardingAuth');
   };
 
   const handleAppleSignIn = () => {
@@ -74,14 +74,14 @@ export default function OnboardingWelcomeScreen({ navigation }) {
 
         {/* Buttons */}
         <View style={[styles.buttonsSection, { paddingBottom: insets.bottom + 24 }]}>
-          {/* Tour Button */}
+          {/* Get Started Button */}
           <TouchableOpacity
             style={styles.tourButton}
-            onPress={handleTour}
+            onPress={handleGetStarted}
             disabled={loading}
             activeOpacity={0.9}
           >
-            <Text style={styles.tourButtonText}>Take a quick tour</Text>
+            <Text style={styles.tourButtonText}>Get Started</Text>
           </TouchableOpacity>
 
           {/* Apple Sign In */}

@@ -20,6 +20,8 @@ import { useGoals } from '../hooks/useGoals';
 import { useImpressions } from '../hooks/useImpressions';
 import FeedCard from '../components/FeedCard';
 import ReportModal from '../components/ReportModal';
+import NotificationBadge from '../components/NotificationBadge';
+import OfflineBanner from '../components/OfflineBanner';
 import { Ionicons } from '@expo/vector-icons';
 
 const FILTER_OPTIONS = [
@@ -27,7 +29,16 @@ const FILTER_OPTIONS = [
   { key: FeedFilter.SIMILAR_GOALS, label: 'Goals' },
   { key: FeedFilter.FRIENDS, label: 'Friends' },
   { key: FeedFilter.NEARBY, label: 'Nearby' },
-  { key: FeedFilter.SAVED, label: 'Saved' },
+];
+
+// Limited filters for PREVIEW_MODE (new users)
+const PREVIEW_FILTER_OPTIONS = [
+  { key: FeedFilter.DISCOVER, label: 'Discover' },
+];
+
+// Limited filters for NEEDS_POST (active users who haven't posted today)
+const NEEDS_POST_FILTER_OPTIONS = [
+  { key: FeedFilter.FRIENDS, label: 'Friends' },
 ];
 
 export default function GateScreen({ navigation }) {
@@ -77,11 +88,8 @@ export default function GateScreen({ navigation }) {
       !hasCheckedFirstTime.current
     ) {
       hasCheckedFirstTime.current = true;
-      // Navigate to Goals tab, then to GoalEditor
-      navigation.navigate('Goals', {
-        screen: 'GoalEditor',
-        params: { goal: null },
-      });
+      // Navigate to GoalEditor for first-time setup
+      navigation.navigate('GoalEditor', { goal: null });
     }
   }, [goalsLoading, loading, goals, navigation]);
 
@@ -91,6 +99,21 @@ export default function GateScreen({ navigation }) {
       refreshState();
     }, [refreshState])
   );
+
+  // Set appropriate filter based on gate state
+  useEffect(() => {
+    if (gateState === GateState.PREVIEW_MODE) {
+      // New users see Discover preview
+      if (filter !== FeedFilter.DISCOVER) {
+        changeFilter(FeedFilter.DISCOVER);
+      }
+    } else if (gateState === GateState.NEEDS_POST) {
+      // Active users who haven't posted see Friends only
+      if (filter !== FeedFilter.FRIENDS) {
+        changeFilter(FeedFilter.FRIENDS);
+      }
+    }
+  }, [gateState, filter, changeFilter]);
 
   // Start/stop tracking when feed is unlocked
   useFocusEffect(
@@ -171,6 +194,9 @@ export default function GateScreen({ navigation }) {
       recordImpression(item.id, item.user_id);
     }
 
+    // Show Add Friend button on Discover feed for non-friends
+    const showAddFriend = filter === FeedFilter.DISCOVER && !item.is_friend;
+
     return (
       <FeedCard
         journal={item}
@@ -181,6 +207,7 @@ export default function GateScreen({ navigation }) {
         onReport={handleReport}
         onPress={handlePostPress}
         onAuthorPress={handleAuthorPress}
+        showAddFriend={showAddFriend}
       />
     );
   }, [user?.id, updateKudos, updateSaved, removeFromFeed, handleReport, handlePostPress, handleAuthorPress, filter, recordImpression]);
@@ -225,20 +252,12 @@ export default function GateScreen({ navigation }) {
         message = 'No nearby posts';
         subtitle = 'No one near you has posted recently';
         break;
-      case FeedFilter.SAVED:
-        icon = 'bookmark-outline';
-        message = 'No saved posts';
-        subtitle = 'Posts you save will appear here';
-        break;
       case FeedFilter.SIMILAR_GOALS:
         icon = 'flag-outline';
         message = 'No similar goal posts';
         subtitle = 'Create goals to find people with shared interests';
         buttonText = 'Create Goal';
-        onButtonPress = () => navigation.navigate('Goals', {
-          screen: 'GoalEditor',
-          params: { goal: null },
-        });
+        onButtonPress = () => navigation.navigate('GoalEditor', { goal: null });
         break;
     }
 
@@ -293,103 +312,170 @@ export default function GateScreen({ navigation }) {
     );
   }
 
-  // NEEDS_POST state
-  if (gateState === GateState.NEEDS_POST) {
+  // Determine which filter options to show based on gate state
+  const getFilterOptions = () => {
+    if (gateState === GateState.PREVIEW_MODE) {
+      return PREVIEW_FILTER_OPTIONS;
+    }
+    if (gateState === GateState.NEEDS_POST) {
+      return NEEDS_POST_FILTER_OPTIONS;
+    }
+    return FILTER_OPTIONS;
+  };
+
+  // Check if current state allows feed viewing
+  const canViewFeed = gateState === GateState.FEED_UNLOCKED ||
+                      gateState === GateState.PREVIEW_MODE ||
+                      gateState === GateState.NEEDS_POST;
+
+  // Feed viewing states (PREVIEW_MODE, NEEDS_POST, FEED_UNLOCKED)
+  if (canViewFeed) {
+    const currentFilterOptions = getFilterOptions();
+    const isPreviewMode = gateState === GateState.PREVIEW_MODE;
+    const isNeedsPost = gateState === GateState.NEEDS_POST;
+
+    // Limit to 5 posts in preview mode
+    const displayJournals = isPreviewMode ? journals.slice(0, 5) : journals;
+
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.content}>
-          <Text style={styles.logo}>ASPYRE</Text>
-          <Text style={styles.greeting}>
-            {profile?.display_name
-              ? `Welcome back, ${profile.display_name.split(' ')[0]}`
-              : 'Welcome back'}
-          </Text>
-          <Text style={styles.subtitle}>
-            Post first to unlock inspiration
-          </Text>
+        {/* Offline Banner */}
+        <OfflineBanner onRetry={handleRefresh} />
 
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('Post')}
-          >
-            <Text style={styles.primaryButtonText}>Post Today's Journal</Text>
-          </TouchableOpacity>
-
-          <View style={styles.explainer}>
-            <Text style={styles.explainerText}>
-              Share your progress first, then see what others are working on.
-            </Text>
-          </View>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerLeft} />
+          <Text style={styles.headerTitle}>ASPYRE</Text>
+          <NotificationBadge />
         </View>
+
+        {/* Soft Gate Banner for PREVIEW_MODE */}
+        {isPreviewMode && (
+          <View style={styles.previewBanner}>
+            <Text style={styles.previewBannerText}>
+              Post your first journal to unlock the full feed
+            </Text>
+            <TouchableOpacity
+              style={styles.previewBannerButton}
+              onPress={() => navigation.navigate('Post')}
+            >
+              <Text style={styles.previewBannerButtonText}>Post Now</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Soft Gate Banner for NEEDS_POST */}
+        {isNeedsPost && (
+          <View style={styles.needsPostBanner}>
+            <Text style={styles.needsPostBannerText}>
+              Post today to unlock Discover
+            </Text>
+            <TouchableOpacity
+              style={styles.needsPostBannerButton}
+              onPress={() => navigation.navigate('Post')}
+            >
+              <Text style={styles.needsPostBannerButtonText}>Post</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Filter Chips */}
+        <View style={styles.filterContainer}>
+          <FlatList
+            horizontal
+            data={currentFilterOptions}
+            renderItem={({ item }) => renderFilterChip(item)}
+            keyExtractor={(item) => item.key}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterList}
+          />
+        </View>
+
+        {/* Feed Content */}
+        {feedLoading && journals.length === 0 ? (
+          <View style={styles.feedLoadingContainer}>
+            <ActivityIndicator size="large" color="#000" />
+          </View>
+        ) : feedError ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>Something went wrong</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={refreshFeed}>
+              <Text style={styles.retryButtonText}>Try Again</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <FlatList
+            data={displayJournals}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.feedContent}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                tintColor="#000"
+              />
+            }
+            onEndReached={!isPreviewMode ? loadMore : undefined}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={!isPreviewMode ? renderFooter : null}
+            ListEmptyComponent={renderEmpty}
+          />
+        )}
+
+        {/* Preview Mode Footer - CTA to post */}
+        {isPreviewMode && displayJournals.length > 0 && (
+          <View style={styles.previewFooter}>
+            <Text style={styles.previewFooterText}>
+              Post your first journal to see more
+            </Text>
+            <TouchableOpacity
+              style={styles.previewFooterButton}
+              onPress={() => navigation.navigate('Post')}
+            >
+              <Text style={styles.previewFooterButtonText}>Get Started</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Report Modal */}
+        <ReportModal
+          visible={reportModalVisible}
+          onClose={() => {
+            setReportModalVisible(false);
+            setReportingJournal(null);
+          }}
+          journal={reportingJournal}
+          userId={user?.id}
+        />
       </SafeAreaView>
     );
   }
 
-  // FEED_UNLOCKED state - show feed inline
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Filter Chips */}
-      <View style={styles.filterContainer}>
-        <FlatList
-          horizontal
-          data={FILTER_OPTIONS}
-          renderItem={({ item }) => renderFilterChip(item)}
-          keyExtractor={(item) => item.key}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterList}
-        />
-      </View>
-
-      {/* Feed Content */}
-      {feedLoading && journals.length === 0 ? (
-        <View style={styles.feedLoadingContainer}>
-          <ActivityIndicator size="large" color="#000" />
-        </View>
-      ) : feedError ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Something went wrong</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={refreshFeed}>
-            <Text style={styles.retryButtonText}>Try Again</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <FlatList
-          data={journals}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.feedContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              tintColor="#000"
-            />
-          }
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={renderFooter}
-          ListEmptyComponent={renderEmpty}
-        />
-      )}
-
-      {/* Report Modal */}
-      <ReportModal
-        visible={reportModalVisible}
-        onClose={() => {
-          setReportModalVisible(false);
-          setReportingJournal(null);
-        }}
-        journal={reportingJournal}
-        userId={user?.id}
-      />
-    </SafeAreaView>
-  );
+  // Fallback (should not reach here)
+  return null;
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  headerLeft: {
+    width: 44,
+  },
+  headerTitle: {
+    fontSize: 14,
+    fontWeight: '300',
+    letterSpacing: 4,
+    color: '#000',
   },
   content: {
     flex: 1,
@@ -603,6 +689,94 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '500',
+    letterSpacing: 1,
+  },
+  // Preview mode banner (new users)
+  previewBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f8f8f8',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  previewBannerText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#333',
+    marginRight: 12,
+  },
+  previewBannerButton: {
+    backgroundColor: '#000',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  previewBannerButtonText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  // Needs post banner (active users)
+  needsPostBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fffdf0',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0e8c0',
+  },
+  needsPostBannerText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#665500',
+    marginRight: 12,
+  },
+  needsPostBannerButton: {
+    backgroundColor: '#000',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+  },
+  needsPostBannerButtonText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  // Preview mode footer
+  previewFooter: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+  },
+  previewFooterText: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#666',
+    marginBottom: 12,
+  },
+  previewFooterButton: {
+    backgroundColor: '#000',
+    paddingVertical: 14,
+    paddingHorizontal: 48,
+  },
+  previewFooterButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
     letterSpacing: 1,
   },
 });

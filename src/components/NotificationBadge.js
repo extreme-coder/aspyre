@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../hooks/useNotifications';
 
@@ -19,7 +20,7 @@ export default function NotificationBadge() {
       onPress={() => navigation.navigate('Notifications')}
     >
       <View style={styles.iconContainer}>
-        <Text style={styles.bellIcon}>🔔</Text>
+        <Ionicons name="notifications-outline" size={22} color="#000" />
         {unreadCount > 0 && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>
@@ -34,15 +35,11 @@ export default function NotificationBadge() {
 
 const styles = StyleSheet.create({
   button: {
-    minWidth: 50,
+    minWidth: 44,
     alignItems: 'flex-end',
   },
   iconContainer: {
     position: 'relative',
-    padding: 4,
-  },
-  bellIcon: {
-    fontSize: 20,
   },
   badge: {
     position: 'absolute',

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../config/supabase';
+import { cacheData, getCachedData, CACHE_KEYS } from '../utils/offlineCache';
 
 const PAGE_SIZE = 20;
 
@@ -27,6 +28,7 @@ export function useFeed(userId, localDate = null) {
   const [error, setError] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [filter, setFilter] = useState(FeedFilter.DISCOVER);
+  const [isFromCache, setIsFromCache] = useState(false);
 
   const cursorRef = useRef(null);
   const isInitialLoadRef = useRef(true);
@@ -37,6 +39,30 @@ export function useFeed(userId, localDate = null) {
     const now = new Date();
     return now.toISOString().split('T')[0];
   }, [localDate]);
+
+  // Get cache key for current filter
+  const getCacheKey = useCallback((filterType) => {
+    switch (filterType) {
+      case FeedFilter.DISCOVER:
+        return `${CACHE_KEYS.FEED_DISCOVER}_${userId}`;
+      case FeedFilter.FRIENDS:
+        return `${CACHE_KEYS.FEED_FRIENDS}_${userId}`;
+      default:
+        return `feed_${filterType}_${userId}`;
+    }
+  }, [userId]);
+
+  // Load cached data if available
+  const loadFromCache = useCallback(async () => {
+    const cacheKey = getCacheKey(filter);
+    const cached = await getCachedData(cacheKey);
+    if (cached && cached.length > 0) {
+      setJournals(cached);
+      setIsFromCache(true);
+      return true;
+    }
+    return false;
+  }, [filter, getCacheKey]);
 
   // Fetch journals from the appropriate RPC
   const fetchJournals = useCallback(async (isLoadMore = false) => {
@@ -90,6 +116,12 @@ export function useFeed(userId, localDate = null) {
         setJournals(prev => [...prev, ...newJournals]);
       } else {
         setJournals(newJournals);
+        setIsFromCache(false); // Mark as fresh data
+        // Cache the initial page for offline access
+        if (newJournals.length > 0) {
+          const cacheKey = getCacheKey(filter);
+          cacheData(cacheKey, newJournals);
+        }
       }
 
       // Update cursor for pagination
@@ -99,13 +131,23 @@ export function useFeed(userId, localDate = null) {
 
       setHasMore(newJournals.length === PAGE_SIZE);
     } catch (err) {
-      setError(err.message);
+      // Try to load from cache on network error
+      if (!isLoadMore) {
+        const hasCached = await loadFromCache();
+        if (hasCached) {
+          setError(null); // Clear error if we have cached data
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
       setLoadingMore(false);
       isInitialLoadRef.current = false;
     }
-  }, [userId, filter, getLocalDate]);
+  }, [userId, filter, getLocalDate, getCacheKey, loadFromCache]);
 
   // Initial fetch and filter change
   useEffect(() => {
@@ -174,6 +216,7 @@ export function useFeed(userId, localDate = null) {
     error,
     hasMore,
     filter,
+    isFromCache,
     changeFilter,
     loadMore,
     refresh,

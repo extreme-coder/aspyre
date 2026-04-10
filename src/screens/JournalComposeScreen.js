@@ -28,12 +28,6 @@ const PRIVACY_OPTIONS = [
   { value: 'only_me', label: 'Only Me' },
 ];
 
-const FEEDBACK_MODES = [
-  { value: 'none', label: 'No feedback' },
-  { value: 'question', label: 'Ask a question' },
-  { value: 'open', label: 'Open to advice' },
-];
-
 const GOAL_TYPE_LABELS = {
   habit: 'Habit',
   skill: 'Skill',
@@ -41,16 +35,10 @@ const GOAL_TYPE_LABELS = {
   mindset: 'Mindset',
 };
 
-// Proof chip type options
-const PROOF_CHIP_TYPES = [
-  { type: 'minutes', label: 'min', placeholder: '45' },
-  { type: 'sessions', label: 'sessions', placeholder: '3' },
-  { type: 'streak', label: 'day streak', placeholder: '7' },
-  { type: 'custom', label: '', placeholder: 'e.g., 5 pages' },
-];
-
 // Autosave debounce delay in ms
 const AUTOSAVE_DELAY = 2000;
+const MIN_BODY_LENGTH = 1;
+const SOFT_NUDGE_LENGTH = 20;
 
 export default function JournalComposeScreen({ navigation }) {
   const { user } = useAuth();
@@ -70,8 +58,6 @@ export default function JournalComposeScreen({ navigation }) {
     saveJournalWithExtras,
     updatePrivacy,
     fetchTodayJournal,
-    fetchBullets,
-    fetchProofChips,
   } = useJournal(user?.id, profile?.timezone);
 
   // Refetch data when screen comes into focus
@@ -82,21 +68,14 @@ export default function JournalComposeScreen({ navigation }) {
     }, [fetchGoals, fetchTodayJournal])
   );
 
-  // Form state - New format
+  // Form state - Simplified format
   const [primaryGoalId, setPrimaryGoalId] = useState(null);
-  const [mediaUri, setMediaUri] = useState(null); // Local or remote URI
-  const [headline, setHeadline] = useState('');
-  const [proofChips, setProofChips] = useState([
-    { id: 'chip_1', type: 'minutes', value: '', label: 'min' },
-  ]);
-  const [bullets, setBullets] = useState([{ id: 'bullet_1', text: '' }]);
-  const [friction, setFriction] = useState('');
-  const [fix, setFix] = useState('');
-  const [takeaway, setTakeaway] = useState('');
-  const [nextStep, setNextStep] = useState('');
-  const [feedbackMode, setFeedbackMode] = useState('open');
-  const [feedbackQuestion, setFeedbackQuestion] = useState('');
-  // Default post privacy based on account privacy (public account = everyone, friends account = friends)
+  const [mediaUri, setMediaUri] = useState(null);
+  const [body, setBody] = useState('');
+  const [challenge, setChallenge] = useState('');
+  const [win, setWin] = useState('');
+  const [tomorrow, setTomorrow] = useState('');
+  const [openToAdvice, setOpenToAdvice] = useState(true);
   const getDefaultPrivacy = useCallback(() => {
     return profile?.account_privacy === 'public' ? 'everyone' : 'friends';
   }, [profile?.account_privacy]);
@@ -105,20 +84,17 @@ export default function JournalComposeScreen({ navigation }) {
   // UI state
   const [showGoalPicker, setShowGoalPicker] = useState(false);
   const [showPrivacyPicker, setShowPrivacyPicker] = useState(false);
-  const [showFeedbackPicker, setShowFeedbackPicker] = useState(false);
+  const [showMoreDetails, setShowMoreDetails] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
 
   const autosaveTimer = useRef(null);
-  const nextBulletId = useRef(2);
-  const nextChipId = useRef(2);
   const justSavedRef = useRef(false);
 
   const loading = journalLoading || goalsLoading;
 
-  // Set default privacy when profile loads (before initialization)
+  // Set default privacy when profile loads
   useEffect(() => {
     if (profile && !initialized && !todayJournal) {
       setPostPrivacy(getDefaultPrivacy());
@@ -131,124 +107,47 @@ export default function JournalComposeScreen({ navigation }) {
 
     setPrimaryGoalId(todayJournal.primary_goal_id);
     setMediaUri(todayJournal.media || null);
-    setHeadline(todayJournal.headline || '');
-    setFriction(todayJournal.challenge || '');
-    setFix(todayJournal.win || '');
-    setTakeaway(todayJournal.takeaway || '');
-    setNextStep(todayJournal.next_step || '');
-    setFeedbackMode(todayJournal.feedback_mode || 'open');
-    setFeedbackQuestion(todayJournal.feedback_question || '');
+    setBody(todayJournal.headline || todayJournal.what_i_did || '');
+    setChallenge(todayJournal.challenge || '');
+    setWin(todayJournal.win || '');
+    setTomorrow(todayJournal.tomorrow_plan || todayJournal.next_step || '');
+    setOpenToAdvice(todayJournal.open_to_feedback !== false);
     setPostPrivacy(todayJournal.post_privacy || getDefaultPrivacy());
 
-    // Fetch bullets and chips
-    const loadedBullets = await fetchBullets(todayJournal.id);
-    if (loadedBullets.length > 0) {
-      const bulletsWithKeys = loadedBullets.map((b, i) => ({
-        ...b,
-        id: `db_bullet_${b.id || i}`,
-      }));
-      setBullets(bulletsWithKeys);
-      nextBulletId.current = loadedBullets.length + 1;
-    } else {
-      setBullets([{ id: 'bullet_1', text: '' }]);
-      nextBulletId.current = 2;
+    // Auto-expand details if any are filled
+    if (todayJournal.challenge || todayJournal.win || todayJournal.tomorrow_plan || todayJournal.next_step) {
+      setShowMoreDetails(true);
     }
+  }, [todayJournal, getDefaultPrivacy]);
 
-    const loadedChips = await fetchProofChips(todayJournal.id);
-    if (loadedChips.length > 0) {
-      const chipsWithKeys = loadedChips.map((c, i) => ({
-        ...c,
-        id: `db_chip_${c.id || i}`,
-      }));
-      setProofChips(chipsWithKeys);
-      nextChipId.current = loadedChips.length + 1;
-    } else {
-      setProofChips([{ id: 'chip_1', type: 'minutes', value: '', label: 'min' }]);
-      nextChipId.current = 2;
-    }
-  }, [todayJournal, fetchBullets, fetchProofChips, getDefaultPrivacy]);
-
-  // Enter edit mode and reload form data
+  // Enter edit mode
   const enterEditMode = useCallback(async () => {
     await loadFormFromJournal();
     setIsEditing(true);
   }, [loadFormFromJournal]);
 
-  // Initialize form from existing journal or draft
+  // Initialize form
   useEffect(() => {
     const initializeForm = async () => {
       if (loading || initialized) return;
 
       if (todayJournal) {
-        // Load from existing journal
-        setPrimaryGoalId(todayJournal.primary_goal_id);
-        setMediaUri(todayJournal.media || null);
-        setHeadline(todayJournal.headline || '');
-        setFriction(todayJournal.challenge || '');
-        setFix(todayJournal.win || '');
-        setTakeaway(todayJournal.takeaway || '');
-        setNextStep(todayJournal.next_step || '');
-        setFeedbackMode(todayJournal.feedback_mode || 'open');
-        setFeedbackQuestion(todayJournal.feedback_question || '');
-        setPostPrivacy(todayJournal.post_privacy || getDefaultPrivacy());
-
-        // Fetch bullets and chips
-        const loadedBullets = await fetchBullets(todayJournal.id);
-        if (loadedBullets.length > 0) {
-          // Add string prefix to ensure unique keys
-          const bulletsWithKeys = loadedBullets.map((b, i) => ({
-            ...b,
-            id: `db_bullet_${b.id || i}`,
-          }));
-          setBullets(bulletsWithKeys);
-          nextBulletId.current = loadedBullets.length + 1;
-        }
-
-        const loadedChips = await fetchProofChips(todayJournal.id);
-        if (loadedChips.length > 0) {
-          // Add string prefix to ensure unique keys
-          const chipsWithKeys = loadedChips.map((c, i) => ({
-            ...c,
-            id: `db_chip_${c.id || i}`,
-          }));
-          setProofChips(chipsWithKeys);
-          nextChipId.current = loadedChips.length + 1;
-        }
+        await loadFormFromJournal();
       } else {
-        // Try loading from draft
         const savedDraft = await loadDraft();
         if (savedDraft) {
           setPrimaryGoalId(savedDraft.primaryGoalId);
           setMediaUri(savedDraft.mediaUri || null);
-          setHeadline(savedDraft.headline || '');
-
-          // Ensure proof chips have IDs
-          const draftChips = savedDraft.proofChips || [{ id: 'chip_1', type: 'minutes', value: '', label: 'min' }];
-          const chipsWithIds = draftChips.map((c, i) => ({
-            ...c,
-            id: c.id || `draft_chip_${i + 1}`,
-          }));
-          setProofChips(chipsWithIds);
-          nextChipId.current = chipsWithIds.length + 1;
-
-          // Ensure bullets have IDs
-          const draftBullets = savedDraft.bullets || [{ id: 'bullet_1', text: '' }];
-          const bulletsWithIds = draftBullets.map((b, i) => ({
-            ...b,
-            id: b.id || `draft_bullet_${i + 1}`,
-          }));
-          setBullets(bulletsWithIds);
-          nextBulletId.current = bulletsWithIds.length + 1;
-
-          setFriction(savedDraft.friction || '');
-          setFix(savedDraft.fix || '');
-          setTakeaway(savedDraft.takeaway || '');
-          setNextStep(savedDraft.nextStep || '');
-          setFeedbackMode(savedDraft.feedbackMode || 'open');
-          setFeedbackQuestion(savedDraft.feedbackQuestion || '');
+          setBody(savedDraft.body || '');
+          setChallenge(savedDraft.challenge || '');
+          setWin(savedDraft.win || '');
+          setTomorrow(savedDraft.tomorrow || '');
+          setOpenToAdvice(savedDraft.openToAdvice !== false);
           setPostPrivacy(savedDraft.postPrivacy || getDefaultPrivacy());
+          if (savedDraft.challenge || savedDraft.win || savedDraft.tomorrow) {
+            setShowMoreDetails(true);
+          }
         } else {
-          // No draft, set default privacy based on account
           setPostPrivacy(getDefaultPrivacy());
         }
       }
@@ -257,21 +156,17 @@ export default function JournalComposeScreen({ navigation }) {
     };
 
     initializeForm();
-  }, [loading, todayJournal, initialized, loadDraft, fetchBullets, fetchProofChips, getDefaultPrivacy]);
+  }, [loading, todayJournal, initialized, loadDraft, loadFormFromJournal, getDefaultPrivacy]);
 
   // Autosave draft
   const draftData = {
     primaryGoalId,
     mediaUri,
-    headline,
-    proofChips,
-    bullets,
-    friction,
-    fix,
-    takeaway,
-    nextStep,
-    feedbackMode,
-    feedbackQuestion,
+    body,
+    challenge,
+    win,
+    tomorrow,
+    openToAdvice,
     postPrivacy,
   };
 
@@ -291,48 +186,20 @@ export default function JournalComposeScreen({ navigation }) {
         clearTimeout(autosaveTimer.current);
       }
     };
-  }, [
-    initialized,
-    hasPostedToday,
-    primaryGoalId,
-    mediaUri,
-    headline,
-    proofChips,
-    bullets,
-    friction,
-    fix,
-    takeaway,
-    nextStep,
-    feedbackMode,
-    feedbackQuestion,
-    postPrivacy,
-    saveDraft,
-  ]);
+  }, [initialized, hasPostedToday, primaryGoalId, mediaUri, body, challenge, win, tomorrow, openToAdvice, postPrivacy, saveDraft]);
 
-  // Check if there are unsaved changes (content that would be lost)
+  // Check for unsaved changes
   const hasUnsavedChanges = useCallback(() => {
-    // If just saved, don't warn
     if (justSavedRef.current) return false;
-
-    // If already posted today and not editing, no changes to lose
     if (hasPostedToday && !isEditing) return false;
 
-    // Check if any meaningful content has been entered
-    const hasHeadline = headline.trim().length > 0;
-    const hasProofContent = proofChips.some(chip =>
-      (chip.value && chip.value.toString().trim().length > 0) ||
-      (chip.label && chip.label.trim().length > 0)
-    );
-    const hasBulletContent = bullets.some(b => b.text && b.text.trim().length > 0);
-    const hasPlaybookContent = friction.trim().length > 0 ||
-      fix.trim().length > 0 ||
-      takeaway.trim().length > 0 ||
-      nextStep.trim().length > 0;
+    const hasBody = body.trim().length > 0;
+    const hasDetails = challenge.trim().length > 0 || win.trim().length > 0 || tomorrow.trim().length > 0;
 
-    return hasHeadline || hasProofContent || hasBulletContent || hasPlaybookContent || mediaUri;
-  }, [hasPostedToday, isEditing, headline, proofChips, bullets, friction, fix, takeaway, nextStep, mediaUri]);
+    return hasBody || hasDetails || mediaUri;
+  }, [hasPostedToday, isEditing, body, challenge, win, tomorrow, mediaUri]);
 
-  // Warn user if they try to leave with unsaved changes (stack navigation)
+  // Warn on navigation
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
       if (!hasUnsavedChanges()) return;
@@ -355,7 +222,6 @@ export default function JournalComposeScreen({ navigation }) {
 
     return unsubscribe;
   }, [navigation, hasUnsavedChanges]);
-
 
   // Image picker
   const pickImage = async () => {
@@ -403,97 +269,32 @@ export default function JournalComposeScreen({ navigation }) {
     ]);
   };
 
-  // Bullet management
-  const addBullet = () => {
-    if (bullets.length < 5) {
-      setBullets([...bullets, { id: `bullet_${nextBulletId.current++}`, text: '' }]);
-    }
-  };
-
-  const updateBullet = (id, text) => {
-    setBullets(bullets.map(b => (b.id === id ? { ...b, text } : b)));
-  };
-
-  const removeBullet = (id) => {
-    if (bullets.length > 1) {
-      setBullets(bullets.filter(b => b.id !== id));
-    }
-  };
-
-  // Proof chip management
-  const addProofChip = () => {
-    if (proofChips.length < 4) {
-      setProofChips([...proofChips, { id: `chip_${nextChipId.current++}`, type: 'custom', value: '', label: '' }]);
-    }
-  };
-
-  const updateProofChip = (index, field, value) => {
-    const updated = [...proofChips];
-    updated[index] = { ...updated[index], [field]: value };
-
-    // Auto-set label for known types, clear for custom
-    if (field === 'type') {
-      const chipType = PROOF_CHIP_TYPES.find(t => t.type === value);
-      if (value === 'custom') {
-        updated[index].label = ''; // Clear label for custom type
-      } else if (chipType && chipType.label) {
-        updated[index].label = chipType.label;
-      }
-    }
-
-    setProofChips(updated);
-  };
-
-  const removeProofChip = (index) => {
-    if (proofChips.length > 1) {
-      setProofChips(proofChips.filter((_, i) => i !== index));
-    }
-  };
-
-  // Validation
-  const getOptionalMissingSections = () => {
-    const missing = [];
-    if (!mediaUri) missing.push('a photo');
-    if (bullets.every(b => !b.text.trim())) missing.push('at least one bullet');
-    if (activeGoals.length > 0 && !primaryGoalId) missing.push('a focus goal');
-    return missing;
-  };
-
-  const isHeadlineMissing = () => !headline.trim();
-
   // Save
   const performSave = async () => {
     setUploadingImage(true);
 
     const journalData = {
       primary_goal_id: primaryGoalId,
-      headline: headline.trim() || null,
-      challenge: friction.trim() || null, // Maps to friction
-      win: fix.trim() || null, // Maps to fix
-      takeaway: takeaway.trim() || null,
-      next_step: nextStep.trim() || null,
-      feedback_mode: feedbackMode,
-      feedback_question: feedbackMode === 'question' ? feedbackQuestion.trim() : null,
+      headline: body.trim() || null,
+      what_i_did: body.trim() || null,
+      challenge: challenge.trim() || null,
+      win: win.trim() || null,
+      tomorrow_plan: tomorrow.trim() || null,
+      next_step: tomorrow.trim() || null,
+      open_to_feedback: openToAdvice,
+      feedback_mode: openToAdvice ? 'open' : 'none',
       post_privacy: postPrivacy,
-      // Legacy fields set to null
-      what_i_did: null,
-      tomorrow_plan: null,
+      // Legacy fields
+      takeaway: null,
       discovery: null,
       mood: null,
       energy: null,
-      open_to_feedback: feedbackMode !== 'none',
     };
-
-    // Filter valid proof chips
-    const validChips = proofChips.filter(c => c.value);
-
-    // Filter valid bullets
-    const validBullets = bullets.filter(b => b.text.trim());
 
     const result = await saveJournalWithExtras(
       journalData,
-      validBullets,
-      validChips,
+      [], // No bullets in simplified composer
+      [], // No proof chips in simplified composer
       mediaUri && !mediaUri.startsWith('http') ? mediaUri : null
     );
 
@@ -506,12 +307,11 @@ export default function JournalComposeScreen({ navigation }) {
         [{ text: 'OK' }]
       );
     } else {
-      // Mark as just saved to prevent unsaved changes warning
       justSavedRef.current = true;
 
       const title = result.wasCreate ? 'Posted!' : 'Updated!';
       const message = result.wasCreate
-        ? "Your proof is live. Keep the streak going!"
+        ? "Your post is live. Keep the streak going!"
         : 'Your changes have been saved.';
       Alert.alert(title, message, [
         {
@@ -528,36 +328,32 @@ export default function JournalComposeScreen({ navigation }) {
   };
 
   const handleSave = async () => {
-    // Headline is required
-    if (isHeadlineMissing()) {
+    const bodyLength = body.trim().length;
+
+    // Minimum 1 character
+    if (bodyLength < MIN_BODY_LENGTH) {
       Alert.alert(
-        'Headline required',
-        'Please add a headline for your post.',
+        'Add something',
+        'Write at least one character to post.',
         [{ text: 'OK' }]
       );
       return;
     }
 
-    // Other fields are optional but we'll ask
-    const missing = getOptionalMissingSections();
-
-    if (missing.length > 0) {
-      const formatted =
-        missing.length === 1
-          ? missing[0]
-          : missing.slice(0, -1).join(', ') + ' and ' + missing[missing.length - 1];
-
+    // Soft nudge if under 20 characters
+    if (bodyLength < SOFT_NUDGE_LENGTH) {
       Alert.alert(
         'Quick check',
-        `You haven't added ${formatted}. Post anyway?`,
+        'Your post is pretty short. Add more detail?',
         [
-          { text: 'Go back', style: 'cancel' },
+          { text: 'Add more', style: 'cancel' },
           { text: 'Post anyway', onPress: performSave },
         ]
       );
-    } else {
-      await performSave();
+      return;
     }
+
+    await performSave();
   };
 
   const handlePrivacyChange = async (newPrivacy) => {
@@ -585,7 +381,7 @@ export default function JournalComposeScreen({ navigation }) {
     );
   }
 
-  // Preview mode - show post as it looks to others
+  // Preview mode - show post after posting
   if (hasPostedToday && !isEditing) {
     const goal = todayJournal?.primary_goal;
 
@@ -611,11 +407,6 @@ export default function JournalComposeScreen({ navigation }) {
               <Image source={{ uri: todayJournal.media }} style={styles.previewHeroImage} />
             )}
 
-            {/* Headline */}
-            {todayJournal?.headline && (
-              <Text style={styles.previewHeadline}>{todayJournal.headline}</Text>
-            )}
-
             {/* Author header */}
             <View style={styles.previewHeader}>
               <View style={styles.authorInfo}>
@@ -637,33 +428,11 @@ export default function JournalComposeScreen({ navigation }) {
               </View>
             </View>
 
-            {/* Proof chips preview */}
-            {proofChips.some(c => c.value) && (
-              <View style={styles.previewChipsRow}>
-                {proofChips
-                  .filter(c => c.value)
-                  .map((chip) => (
-                    <View key={chip.id} style={styles.previewChip}>
-                      <Text style={styles.previewChipText}>
-                        {chip.value} {chip.label}
-                      </Text>
-                    </View>
-                  ))}
-              </View>
-            )}
-
-            {/* Bullets preview */}
-            {bullets.some(b => b.text.trim()) && (
-              <View style={styles.previewBullets}>
-                {bullets
-                  .filter(b => b.text.trim())
-                  .map((bullet) => (
-                    <View key={bullet.id} style={styles.previewBulletRow}>
-                      <Text style={styles.previewBulletDot}>•</Text>
-                      <Text style={styles.previewBulletText}>{bullet.text}</Text>
-                    </View>
-                  ))}
-              </View>
+            {/* Body */}
+            {(todayJournal?.headline || todayJournal?.what_i_did) && (
+              <Text style={styles.previewBody}>
+                {todayJournal.headline || todayJournal.what_i_did}
+              </Text>
             )}
 
             {/* Privacy */}
@@ -711,16 +480,10 @@ export default function JournalComposeScreen({ navigation }) {
 
           <TouchableOpacity
             style={styles.viewAllPostsButton}
-            onPress={() => navigation.navigate('Profile')}
+            onPress={() => navigation.navigate('Me')}
           >
             <Text style={styles.viewAllPostsButtonText}>View All Your Posts</Text>
           </TouchableOpacity>
-
-          <View style={styles.previewExplainer}>
-            <Text style={styles.previewExplainerText}>
-              This is how your post appears in the feed.
-            </Text>
-          </View>
         </ScrollView>
       </SafeAreaView>
     );
@@ -789,13 +552,29 @@ export default function JournalComposeScreen({ navigation }) {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Focus Goal - First thing to select */}
+          {/* Body - Main text field */}
           <View style={styles.field}>
-            <Text style={styles.label}>Focus Goal</Text>
+            <TextInput
+              style={styles.bodyInput}
+              value={body}
+              onChangeText={setBody}
+              placeholder="What did you work on today?"
+              placeholderTextColor="#999"
+              multiline
+              autoFocus={!hasPostedToday}
+            />
+            <Text style={[styles.charCount, body.length < SOFT_NUDGE_LENGTH && body.length > 0 && styles.charCountWarning]}>
+              {body.length} characters
+            </Text>
+          </View>
+
+          {/* Focus Goal */}
+          <View style={styles.field}>
+            <Text style={styles.label}>Goal</Text>
             {activeGoals.length === 0 ? (
               <TouchableOpacity
                 style={styles.noGoalPrompt}
-                onPress={() => navigation.navigate('Goals')}
+                onPress={() => navigation.navigate('GoalEditor', { goal: null })}
               >
                 <Text style={styles.noGoalText}>No goals yet. Tap to create one.</Text>
               </TouchableOpacity>
@@ -805,12 +584,23 @@ export default function JournalComposeScreen({ navigation }) {
                 onPress={() => setShowGoalPicker(!showGoalPicker)}
               >
                 <Text style={[styles.pickerText, !selectedGoal && styles.pickerPlaceholder]}>
-                  {selectedGoal ? selectedGoal.title : 'Select a goal...'}
+                  {selectedGoal ? selectedGoal.title : 'Select a goal (optional)'}
                 </Text>
               </TouchableOpacity>
             )}
             {showGoalPicker && (
               <View style={styles.pickerOptions}>
+                <TouchableOpacity
+                  style={[styles.pickerOption, !primaryGoalId && styles.pickerOptionActive]}
+                  onPress={() => {
+                    setPrimaryGoalId(null);
+                    setShowGoalPicker(false);
+                  }}
+                >
+                  <Text style={[styles.pickerOptionText, !primaryGoalId && styles.pickerOptionTextActive]}>
+                    None
+                  </Text>
+                </TouchableOpacity>
                 {activeGoals.map((goal) => (
                   <TouchableOpacity
                     key={goal.id}
@@ -838,241 +628,27 @@ export default function JournalComposeScreen({ navigation }) {
             )}
           </View>
 
-          {/* Hero Image Picker */}
-          <TouchableOpacity style={styles.imagePicker} onPress={showImageOptions}>
+          {/* Photo */}
+          <TouchableOpacity style={styles.photoButton} onPress={showImageOptions}>
             {mediaUri && typeof mediaUri === 'string' && mediaUri.length > 0 ? (
-              <Image source={{ uri: mediaUri }} style={styles.heroImage} />
+              <View style={styles.photoPreview}>
+                <Image source={{ uri: mediaUri }} style={styles.photoImage} />
+                <View style={styles.photoOverlay}>
+                  <Ionicons name="camera-outline" size={20} color="#fff" />
+                  <Text style={styles.photoChangeText}>Change</Text>
+                </View>
+              </View>
             ) : (
-              <View style={styles.imagePickerPlaceholder}>
-                <Ionicons name="camera-outline" size={32} color="#999" />
-                <Text style={styles.imagePickerHint}>Show your progress</Text>
+              <View style={styles.photoPlaceholder}>
+                <Ionicons name="camera-outline" size={24} color="#666" />
+                <Text style={styles.photoPlaceholderText}>Add photo (optional)</Text>
               </View>
             )}
           </TouchableOpacity>
 
-          {mediaUri && (
-            <TouchableOpacity style={styles.changeImageButton} onPress={showImageOptions}>
-              <Ionicons name="camera-outline" size={16} color="#666" />
-              <Text style={styles.changeImageText}>Change</Text>
-            </TouchableOpacity>
-          )}
-
-          {/* Headline */}
-          <View style={styles.field}>
-            <Text style={styles.label}>Headline</Text>
-            <TextInput
-              style={styles.headlineInput}
-              value={headline}
-              onChangeText={setHeadline}
-              placeholder="What's your win today?"
-              placeholderTextColor="#999"
-              maxLength={100}
-            />
-            <Text style={styles.charCount}>{headline.length}/100</Text>
-          </View>
-
-          {/* Proof Chips */}
-          <View style={styles.field}>
-            <Text style={styles.label}>Proof (Metrics)</Text>
-            <Text style={styles.hint}>Add 1-4 numbers that prove your progress</Text>
-
-            {proofChips.map((chip, index) => (
-              <View key={chip.id} style={styles.chipRow}>
-                <TextInput
-                  style={[
-                    styles.chipValueInput,
-                    focusedField === `chip_value_${index}` && styles.inputFocused,
-                  ]}
-                  value={chip.value}
-                  onChangeText={(text) => updateProofChip(index, 'value', text)}
-                  onFocus={() => setFocusedField(`chip_value_${index}`)}
-                  onBlur={() => setFocusedField(null)}
-                  placeholder={PROOF_CHIP_TYPES.find(t => t.type === chip.type)?.placeholder || ''}
-                  placeholderTextColor="#ccc"
-                  keyboardType="numeric"
-                />
-                <TouchableOpacity
-                  style={styles.chipTypeButton}
-                  onPress={() => {
-                    const currentIndex = PROOF_CHIP_TYPES.findIndex(t => t.type === chip.type);
-                    const nextIndex = (currentIndex + 1) % PROOF_CHIP_TYPES.length;
-                    const nextType = PROOF_CHIP_TYPES[nextIndex];
-                    updateProofChip(index, 'type', nextType.type);
-                  }}
-                >
-                  <Text style={styles.chipTypeText}>
-                    {(chip.type === 'custom' ? (chip.label || 'custom') : PROOF_CHIP_TYPES.find(t => t.type === chip.type)?.label)?.toLowerCase()}
-                  </Text>
-                </TouchableOpacity>
-                {chip.type === 'custom' && (
-                  <TextInput
-                    style={[
-                      styles.chipLabelInput,
-                      focusedField === `chip_label_${index}` && styles.inputFocused,
-                    ]}
-                    value={chip.label}
-                    onChangeText={(text) => updateProofChip(index, 'label', text.toLowerCase().replace(/[^a-z]/g, ''))}
-                    onFocus={() => setFocusedField(`chip_label_${index}`)}
-                    onBlur={() => setFocusedField(null)}
-                    placeholder="label"
-                    placeholderTextColor="#ccc"
-                  />
-                )}
-                {proofChips.length > 1 && (
-                  <TouchableOpacity
-                    style={styles.removeChipButton}
-                    onPress={() => removeProofChip(index)}
-                  >
-                    <Text style={styles.removeChipText}>×</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            ))}
-
-            {proofChips.length < 4 && (
-              <TouchableOpacity style={styles.addButton} onPress={addProofChip}>
-                <Text style={styles.addButtonText}>+ Add Metric</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {/* Bullets */}
-          <View style={styles.field}>
-            <Text style={styles.label}>What Happened</Text>
-            <Text style={styles.hint}>2-5 bullet points about your session</Text>
-
-            {bullets.map((bullet, index) => (
-              <View key={bullet.id} style={styles.bulletRow}>
-                <Text style={styles.bulletDot}>•</Text>
-                <TextInput
-                  style={styles.bulletInput}
-                  value={bullet.text}
-                  onChangeText={(text) => updateBullet(bullet.id, text)}
-                  placeholder={index === 0 ? 'What did you work on?' : 'Add another point...'}
-                  placeholderTextColor="#999"
-                />
-                {bullets.length > 1 && (
-                  <TouchableOpacity
-                    style={styles.removeBulletButton}
-                    onPress={() => removeBullet(bullet.id)}
-                  >
-                    <Text style={styles.removeBulletText}>×</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            ))}
-
-            {bullets.length < 5 && (
-              <TouchableOpacity style={styles.addButton} onPress={addBullet}>
-                <Text style={styles.addButtonText}>+ Add Bullet</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {/* Friction & Fix */}
-          <View style={styles.sectionDivider}>
-            <Text style={styles.sectionDividerText}>Playbook</Text>
-          </View>
-
-          <View style={styles.field}>
-            <Text style={styles.label}>Friction</Text>
-            <TextInput
-              style={styles.textInput}
-              value={friction}
-              onChangeText={setFriction}
-              placeholder="What was hard or got in your way?"
-              placeholderTextColor="#999"
-              multiline
-            />
-          </View>
-
-          <View style={styles.field}>
-            <Text style={styles.label}>Fix</Text>
-            <TextInput
-              style={styles.textInput}
-              value={fix}
-              onChangeText={setFix}
-              placeholder="How did you handle it?"
-              placeholderTextColor="#999"
-              multiline
-            />
-          </View>
-
-          <View style={styles.field}>
-            <Text style={styles.label}>Takeaway</Text>
-            <TextInput
-              style={styles.textInput}
-              value={takeaway}
-              onChangeText={setTakeaway}
-              placeholder="What's your key insight?"
-              placeholderTextColor="#999"
-              multiline
-            />
-          </View>
-
-          <View style={styles.field}>
-            <Text style={styles.label}>Next Step</Text>
-            <TextInput
-              style={styles.textInput}
-              value={nextStep}
-              onChangeText={setNextStep}
-              placeholder="What will you do next?"
-              placeholderTextColor="#999"
-            />
-          </View>
-
-          {/* Feedback Mode */}
-          <View style={styles.field}>
-            <Text style={styles.label}>Feedback</Text>
-            <TouchableOpacity
-              style={styles.picker}
-              onPress={() => setShowFeedbackPicker(!showFeedbackPicker)}
-            >
-              <Text style={styles.pickerText}>
-                {FEEDBACK_MODES.find((f) => f.value === feedbackMode)?.label}
-              </Text>
-            </TouchableOpacity>
-            {showFeedbackPicker && (
-              <View style={styles.pickerOptions}>
-                {FEEDBACK_MODES.map((option) => (
-                  <TouchableOpacity
-                    key={option.value}
-                    style={[
-                      styles.pickerOption,
-                      feedbackMode === option.value && styles.pickerOptionActive,
-                    ]}
-                    onPress={() => {
-                      setFeedbackMode(option.value);
-                      setShowFeedbackPicker(false);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.pickerOptionText,
-                        feedbackMode === option.value && styles.pickerOptionTextActive,
-                      ]}
-                    >
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-
-            {feedbackMode === 'question' && (
-              <TextInput
-                style={[styles.textInput, styles.questionInput]}
-                value={feedbackQuestion}
-                onChangeText={setFeedbackQuestion}
-                placeholder="What would you like to know?"
-                placeholderTextColor="#999"
-              />
-            )}
-          </View>
-
           {/* Privacy */}
           <View style={styles.field}>
-            <Text style={styles.label}>Who Can See This</Text>
+            <Text style={styles.label}>Privacy</Text>
             <TouchableOpacity
               style={styles.picker}
               onPress={() => setShowPrivacyPicker(!showPrivacyPicker)}
@@ -1106,6 +682,74 @@ export default function JournalComposeScreen({ navigation }) {
             )}
           </View>
 
+          {/* Collapsible "Add more details" */}
+          <TouchableOpacity
+            style={styles.moreDetailsToggle}
+            onPress={() => setShowMoreDetails(!showMoreDetails)}
+          >
+            <Text style={styles.moreDetailsToggleText}>
+              {showMoreDetails ? 'Hide details' : 'Add more details'}
+            </Text>
+            <Ionicons
+              name={showMoreDetails ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color="#666"
+            />
+          </TouchableOpacity>
+
+          {showMoreDetails && (
+            <View style={styles.moreDetailsSection}>
+              {/* Challenge */}
+              <View style={styles.detailField}>
+                <Text style={styles.detailLabel}>Challenge</Text>
+                <TextInput
+                  style={styles.detailInput}
+                  value={challenge}
+                  onChangeText={setChallenge}
+                  placeholder="What was hard?"
+                  placeholderTextColor="#999"
+                  multiline
+                />
+              </View>
+
+              {/* Win */}
+              <View style={styles.detailField}>
+                <Text style={styles.detailLabel}>Win</Text>
+                <TextInput
+                  style={styles.detailInput}
+                  value={win}
+                  onChangeText={setWin}
+                  placeholder="What went well?"
+                  placeholderTextColor="#999"
+                  multiline
+                />
+              </View>
+
+              {/* Tomorrow */}
+              <View style={styles.detailField}>
+                <Text style={styles.detailLabel}>Tomorrow</Text>
+                <TextInput
+                  style={styles.detailInput}
+                  value={tomorrow}
+                  onChangeText={setTomorrow}
+                  placeholder="What's next?"
+                  placeholderTextColor="#999"
+                />
+              </View>
+
+              {/* Open to Advice */}
+              <TouchableOpacity
+                style={styles.checkboxRow}
+                onPress={() => setOpenToAdvice(!openToAdvice)}
+              >
+                <View style={[styles.checkbox, openToAdvice && styles.checkboxChecked]}>
+                  {openToAdvice && <Ionicons name="checkmark" size={14} color="#fff" />}
+                </View>
+                <Text style={styles.checkboxLabel}>Open to advice</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {error && (
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>{error}</Text>
@@ -1136,16 +780,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
-  },
-  cancelButton: {
-    fontSize: 15,
-    fontWeight: '400',
-    color: '#555',
-    minWidth: 50,
   },
   dateText: {
     fontSize: 13,
@@ -1167,9 +805,6 @@ const styles = StyleSheet.create({
     minWidth: 50,
     textAlign: 'right',
   },
-  placeholder: {
-    minWidth: 50,
-  },
   editNotice: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -1181,237 +816,51 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     color: '#666',
-    letterSpacing: 0.3,
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    paddingHorizontal: 24,
-    paddingTop: 28,
-    paddingBottom: 24,
-  },
-
-  // Image picker
-  imagePicker: {
-    marginBottom: 24,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  imagePickerPlaceholder: {
-    aspectRatio: 4 / 3,
-    backgroundColor: '#fafafa',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#e5e5e5',
-    borderStyle: 'dashed',
-    borderRadius: 12,
-  },
-  imagePickerIcon: {
-    fontSize: 40,
-    fontWeight: '200',
-    color: '#bbb',
-  },
-  imagePickerText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#555',
-    marginTop: 8,
-  },
-  imagePickerHint: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#888',
-    marginTop: 6,
-  },
-  heroImage: {
-    width: '100%',
-    aspectRatio: 4 / 3,
-    borderRadius: 12,
-  },
-  changeImageButton: {
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 20,
-    gap: 6,
-  },
-  changeImageText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#555',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 40,
   },
 
   // Fields
   field: {
-    marginBottom: 28,
+    marginBottom: 20,
   },
   label: {
     fontSize: 12,
     fontWeight: '600',
-    letterSpacing: 1.5,
+    letterSpacing: 1,
     color: '#444',
     textTransform: 'uppercase',
-    marginBottom: 12,
+    marginBottom: 10,
   },
-  hint: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#777',
-    marginBottom: 14,
-    marginTop: -6,
-  },
-  headlineInput: {
+
+  // Body input
+  bodyInput: {
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
     padding: 16,
-    fontSize: 18,
-    fontWeight: '500',
+    fontSize: 16,
+    fontWeight: '400',
     color: '#000',
+    minHeight: 120,
+    textAlignVertical: 'top',
+    lineHeight: 24,
   },
   charCount: {
     fontSize: 11,
     fontWeight: '400',
-    color: '#aaa',
+    color: '#999',
     textAlign: 'right',
     marginTop: 6,
   },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 16,
-    fontSize: 15,
-    fontWeight: '400',
-    color: '#000',
-    minHeight: 80,
-    textAlignVertical: 'top',
-    lineHeight: 22,
-  },
-  questionInput: {
-    marginTop: 14,
-  },
-  inputFocused: {
-    borderColor: '#000',
-    borderWidth: 2,
-  },
-
-  // Proof chips
-  chipRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    gap: 10,
-  },
-  chipValueInput: {
-    width: 70,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
-    textAlign: 'center',
-  },
-  chipTypeButton: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  chipTypeText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#555',
-  },
-  chipLabelInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#000',
-  },
-  removeChipButton: {
-    padding: 10,
-  },
-  removeChipText: {
-    fontSize: 22,
-    fontWeight: '300',
-    color: '#999',
-  },
-
-  // Bullets
-  bulletRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 10,
-  },
-  bulletDot: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    marginRight: 10,
-    marginTop: 10,
-  },
-  bulletInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 14,
-    fontSize: 15,
-    fontWeight: '400',
-    color: '#000',
-    lineHeight: 22,
-  },
-  removeBulletButton: {
-    padding: 10,
-    marginLeft: 4,
-  },
-  removeBulletText: {
-    fontSize: 22,
-    fontWeight: '300',
-    color: '#999',
-  },
-
-  // Add buttons
-  addButton: {
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  addButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#555',
-  },
-
-  // Section divider
-  sectionDivider: {
-    borderTopWidth: 1,
-    borderTopColor: '#e5e5e5',
-    paddingTop: 32,
-    marginTop: 8,
-    marginBottom: 28,
-    alignItems: 'center',
-  },
-  sectionDividerText: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 2,
-    color: '#999',
-    textTransform: 'uppercase',
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    marginTop: -20,
+  charCountWarning: {
+    color: '#f59e0b',
   },
 
   // Pickers
@@ -1419,7 +868,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    padding: 16,
+    padding: 14,
   },
   pickerText: {
     fontSize: 15,
@@ -1438,7 +887,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   pickerOption: {
-    padding: 16,
+    padding: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     flexDirection: 'row',
@@ -1458,23 +907,139 @@ const styles = StyleSheet.create({
   },
   pickerOptionType: {
     fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 1,
+    fontWeight: '500',
     color: '#888',
-    textTransform: 'uppercase',
+    textTransform: 'capitalize',
   },
   noGoalPrompt: {
     borderWidth: 1,
     borderColor: '#ddd',
     borderStyle: 'dashed',
     borderRadius: 8,
-    padding: 16,
+    padding: 14,
   },
   noGoalText: {
     fontSize: 14,
     fontWeight: '400',
     color: '#888',
     textAlign: 'center',
+  },
+
+  // Photo button
+  photoButton: {
+    marginBottom: 20,
+  },
+  photoPlaceholder: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderStyle: 'dashed',
+    borderRadius: 8,
+    padding: 16,
+    gap: 10,
+  },
+  photoPlaceholderText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#666',
+  },
+  photoPreview: {
+    position: 'relative',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  photoImage: {
+    width: '100%',
+    aspectRatio: 4 / 3,
+  },
+  photoOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    gap: 6,
+  },
+  photoChangeText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#fff',
+  },
+
+  // More details toggle
+  moreDetailsToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    marginTop: 8,
+    gap: 6,
+  },
+  moreDetailsToggleText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#666',
+  },
+
+  // More details section
+  moreDetailsSection: {
+    paddingTop: 16,
+  },
+  detailField: {
+    marginBottom: 16,
+  },
+  detailLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 1,
+    color: '#666',
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  detailInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 14,
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#000',
+    minHeight: 60,
+    textAlignVertical: 'top',
+  },
+
+  // Checkbox
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    gap: 12,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#000',
+    borderColor: '#000',
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#333',
   },
 
   // Error
@@ -1498,7 +1063,7 @@ const styles = StyleSheet.create({
 
   // Preview styles
   previewContent: {
-    padding: 24,
+    padding: 20,
   },
   previewCard: {
     borderWidth: 1,
@@ -1510,20 +1075,11 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 4 / 3,
   },
-  previewHeadline: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#000',
-    padding: 18,
-    paddingBottom: 10,
-    lineHeight: 26,
-  },
   previewHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    padding: 18,
-    paddingTop: 10,
+    padding: 16,
   },
   authorInfo: {
     flexDirection: 'row',
@@ -1553,58 +1109,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '400',
     color: '#666',
-    marginTop: 3,
+    marginTop: 2,
   },
-  previewChipsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 18,
-    paddingBottom: 14,
-    gap: 10,
-  },
-  previewChip: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
-  },
-  previewChipText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
-  },
-  previewBullets: {
-    paddingHorizontal: 18,
-    paddingBottom: 18,
-  },
-  previewBulletRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  previewBulletDot: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#555',
-    marginRight: 10,
-  },
-  previewBulletText: {
-    flex: 1,
+  previewBody: {
     fontSize: 15,
     fontWeight: '400',
     color: '#333',
     lineHeight: 22,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   previewFooter: {
-    padding: 18,
-    paddingTop: 14,
+    padding: 16,
     borderTopWidth: 1,
     borderTopColor: '#eee',
   },
   privacyBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   privacyBadgeLabel: {
     fontSize: 13,
@@ -1626,51 +1149,33 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    margin: 18,
+    margin: 16,
     marginTop: 0,
     overflow: 'hidden',
   },
   previewEditButton: {
-    marginTop: 20,
+    marginTop: 16,
     backgroundColor: '#000',
-    borderRadius: 10,
-    paddingVertical: 16,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    borderRadius: 8,
+    paddingVertical: 14,
     alignItems: 'center',
-    gap: 12,
   },
   previewEditButtonText: {
     fontSize: 14,
     fontWeight: '600',
     color: '#fff',
-    letterSpacing: 0.5,
   },
   viewAllPostsButton: {
-    marginTop: 14,
-    borderWidth: 1.5,
+    marginTop: 12,
+    borderWidth: 1,
     borderColor: '#000',
-    borderRadius: 10,
-    paddingVertical: 16,
-    justifyContent: 'center',
+    borderRadius: 8,
+    paddingVertical: 14,
     alignItems: 'center',
   },
   viewAllPostsButtonText: {
     fontSize: 14,
     fontWeight: '600',
     color: '#000',
-    letterSpacing: 0.5,
-  },
-  previewExplainer: {
-    marginTop: 28,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  previewExplainerText: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#888',
-    textAlign: 'center',
   },
 });

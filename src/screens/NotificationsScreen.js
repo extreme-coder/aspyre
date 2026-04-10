@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../hooks/useNotifications';
+import { useFriends } from '../hooks/useFriends';
 import { getNotificationNavigation } from '../utils/pushNotifications';
 
 // Notification type icons (emoji-based for simplicity)
@@ -55,7 +56,11 @@ export default function NotificationsScreen({ navigation }) {
     clearAll,
   } = useNotifications(user?.id);
 
-  const [refreshing, setRefreshing] = React.useState(false);
+  const { acceptRequest, declineRequest } = useFriends(user?.id);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [processingRequestId, setProcessingRequestId] = useState(null);
+  const [handledRequests, setHandledRequests] = useState(new Set());
 
   useFocusEffect(
     useCallback(() => {
@@ -127,9 +132,49 @@ export default function NotificationsScreen({ navigation }) {
     );
   };
 
+  // Handle accept friend request inline
+  const handleAcceptRequest = async (notification) => {
+    const requestId = notification.data?.request_id;
+    if (!requestId) return;
+
+    setProcessingRequestId(requestId);
+    const result = await acceptRequest(requestId);
+    setProcessingRequestId(null);
+
+    if (result.error) {
+      Alert.alert('Error', result.error.message || 'Failed to accept request');
+    } else {
+      // Mark notification as read and track that we handled it
+      await markAsRead(notification.id);
+      setHandledRequests(prev => new Set([...prev, requestId]));
+    }
+  };
+
+  // Handle decline friend request inline
+  const handleDeclineRequest = async (notification) => {
+    const requestId = notification.data?.request_id;
+    if (!requestId) return;
+
+    setProcessingRequestId(requestId);
+    const result = await declineRequest(requestId);
+    setProcessingRequestId(null);
+
+    if (result.error) {
+      Alert.alert('Error', result.error.message || 'Failed to decline request');
+    } else {
+      // Mark notification as read and track that we handled it
+      await markAsRead(notification.id);
+      setHandledRequests(prev => new Set([...prev, requestId]));
+    }
+  };
+
   const renderNotification = ({ item }) => {
     const isUnread = !item.read_at;
     const icon = NOTIFICATION_ICONS[item.type] || '📬';
+    const isFriendRequest = item.type === 'friend_request';
+    const requestId = item.data?.request_id;
+    const isProcessing = processingRequestId === requestId;
+    const wasHandled = handledRequests.has(requestId);
 
     return (
       <TouchableOpacity
@@ -146,11 +191,44 @@ export default function NotificationsScreen({ navigation }) {
             <Text style={[styles.notificationTitle, isUnread && styles.textUnread]}>
               {item.title}
             </Text>
-            {isUnread && <View style={styles.unreadDot} />}
+            {isUnread && !isFriendRequest && <View style={styles.unreadDot} />}
           </View>
           <Text style={styles.notificationBody} numberOfLines={2}>
             {item.body}
           </Text>
+
+          {/* Inline Accept/Decline for friend requests */}
+          {isFriendRequest && !wasHandled && (
+            <View style={styles.friendRequestActions}>
+              {isProcessing ? (
+                <ActivityIndicator size="small" color="#000" />
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={styles.acceptButton}
+                    onPress={() => handleAcceptRequest(item)}
+                  >
+                    <Text style={styles.acceptButtonText}>Accept</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.declineButton}
+                    onPress={() => handleDeclineRequest(item)}
+                  >
+                    <Text style={styles.declineButtonText}>Decline</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          )}
+
+          {/* Show "Accepted" label if handled */}
+          {isFriendRequest && wasHandled && (
+            <View style={styles.handledLabel}>
+              <Ionicons name="checkmark-circle" size={14} color="#4CAF50" />
+              <Text style={styles.handledLabelText}>Responded</Text>
+            </View>
+          )}
+
           <Text style={styles.notificationTime}>
             {formatRelativeTime(item.created_at)}
           </Text>
@@ -363,5 +441,47 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#fff',
     letterSpacing: 1,
+  },
+  // Inline friend request actions
+  friendRequestActions: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 10,
+    marginBottom: 6,
+  },
+  acceptButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 4,
+  },
+  acceptButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  declineButton: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 4,
+  },
+  declineButtonText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#666',
+  },
+  handledLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  handledLabelText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#4CAF50',
   },
 });

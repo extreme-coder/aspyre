@@ -16,6 +16,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import NotificationBadge from '../components/NotificationBadge';
 import { useProfile } from '../hooks/useProfile';
 import { useProfileStats } from '../hooks/useProfileStats';
 import { useMyJournals } from '../hooks/useMyJournals';
@@ -24,7 +25,7 @@ import { useFriends } from '../hooks/useFriends';
 import { useBlocks } from '../hooks/useBlocks';
 import { supabase } from '../config/supabase';
 
-const TABS = ['Journals', 'Goals', 'Insights'];
+const TABS = ['Journals', 'Goals', 'Saved'];
 const OTHER_USER_TABS = ['Journals', 'Goals'];
 
 const PRIVACY_LABELS = {
@@ -497,22 +498,14 @@ export default function ProfileScreen({ route, navigation }) {
         </View>
       )}
 
-      {/* Edit Profile & Saved Buttons (own profile) or Friend Actions (other user) */}
+      {/* Edit Profile Button (own profile) or Friend Actions (other user) */}
       {isOwnProfile ? (
-        <View style={styles.profileButtonsRow}>
-          <TouchableOpacity
-            style={styles.editProfileButton}
-            onPress={() => navigation.navigate('EditProfile')}
-          >
-            <Text style={styles.editProfileText}>Edit Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.savedButton}
-            onPress={() => navigation.navigate('Saved')}
-          >
-            <Text style={styles.savedButtonText}>Saved</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.editProfileButton}
+          onPress={() => navigation.navigate('EditProfile')}
+        >
+          <Text style={styles.editProfileText}>Edit Profile</Text>
+        </TouchableOpacity>
       ) : (
         <View style={styles.friendActionSection}>
           {renderActionButton()}
@@ -542,7 +535,7 @@ export default function ProfileScreen({ route, navigation }) {
     const icons = {
       Journals: isActive ? 'book' : 'book-outline',
       Goals: isActive ? 'flag' : 'flag-outline',
-      Insights: isActive ? 'stats-chart' : 'stats-chart-outline',
+      Saved: isActive ? 'bookmark' : 'bookmark-outline',
     };
     return icons[tab] || 'ellipse-outline';
   };
@@ -712,7 +705,7 @@ export default function ProfileScreen({ route, navigation }) {
     <TouchableOpacity
       key={goal.id}
       style={styles.goalItem}
-      onPress={() => navigation.navigate('MainTabs', { screen: 'Goals', params: { screen: 'GoalEditor', params: { goal } } })}
+      onPress={() => navigation.navigate('GoalEditor', { goal })}
     >
       <View style={styles.goalInfo}>
         <Text style={styles.goalTitle}>{goal.title}</Text>
@@ -750,7 +743,7 @@ export default function ProfileScreen({ route, navigation }) {
             </Text>
             <TouchableOpacity
               style={styles.ctaButton}
-              onPress={() => navigation.navigate('MainTabs', { screen: 'Goals' })}
+              onPress={() => navigation.navigate('GoalEditor', { goal: null })}
             >
               <Text style={styles.ctaButtonText}>Create a Goal</Text>
             </TouchableOpacity>
@@ -763,7 +756,7 @@ export default function ProfileScreen({ route, navigation }) {
           {activeGoals.map(renderGoalItem)}
           <TouchableOpacity
             style={styles.viewAllGoalsButton}
-            onPress={() => navigation.navigate('MainTabs', { screen: 'Goals' })}
+            onPress={() => navigation.navigate('GoalsList')}
           >
             <Text style={styles.viewAllGoalsText}>View All Goals</Text>
           </TouchableOpacity>
@@ -798,35 +791,20 @@ export default function ProfileScreen({ route, navigation }) {
     }
   };
 
-  const renderInsightsTab = () => {
-    const weeklyData = [
-      { label: 'This Week', value: stats.journalsThisWeek },
-      { label: 'Current Streak', value: stats.currentStreak },
-      { label: 'Best Streak', value: stats.longestStreak },
-      { label: 'Total Entries', value: stats.totalJournals },
-    ];
-
+  const renderSavedTab = () => {
     return (
-      <View style={styles.insightsContainer}>
-        <Text style={styles.insightsTitle}>Your Progress</Text>
-
-        <View style={styles.insightsGrid}>
-          {weeklyData.map((item, index) => (
-            <View key={index} style={styles.insightCard}>
-              <Text style={styles.insightValue}>{item.value}</Text>
-              <Text style={styles.insightLabel}>{item.label}</Text>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.insightsTip}>
-          <Text style={styles.tipTitle}>Keep Going!</Text>
-          <Text style={styles.tipText}>
-            {stats.currentStreak > 0
-              ? `You're on a ${stats.currentStreak}-day streak! Don't break the chain.`
-              : 'Start a streak by posting today. Consistency builds habits!'}
-          </Text>
-        </View>
+      <View style={styles.savedTabContainer}>
+        <TouchableOpacity
+          style={styles.viewSavedButton}
+          onPress={() => navigation.navigate('Saved')}
+        >
+          <Ionicons name="bookmark-outline" size={24} color="#000" />
+          <Text style={styles.viewSavedText}>View Saved Posts</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
+        </TouchableOpacity>
+        <Text style={styles.savedHint}>
+          Posts you save from the feed will appear here
+        </Text>
       </View>
     );
   };
@@ -837,8 +815,8 @@ export default function ProfileScreen({ route, navigation }) {
         return renderJournalsTab();
       case 'Goals':
         return renderGoalsTab();
-      case 'Insights':
-        return renderInsightsTab();
+      case 'Saved':
+        return renderSavedTab();
       default:
         return null;
     }
@@ -885,7 +863,21 @@ export default function ProfileScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {!isOwnProfile && (
+      {isOwnProfile ? (
+        <View style={styles.ownProfileHeader}>
+          <View style={styles.headerLeft} />
+          <Text style={styles.ownProfileHeaderTitle}>ME</Text>
+          <View style={styles.headerRight}>
+            <NotificationBadge />
+            <TouchableOpacity
+              style={styles.settingsButton}
+              onPress={() => navigation.navigate('Settings')}
+            >
+              <Ionicons name="settings-outline" size={22} color="#000" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
         <>
           <TouchableOpacity style={styles.backIconButton} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#000" />
@@ -996,6 +988,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  ownProfileHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  headerLeft: {
+    width: 70,
+  },
+  ownProfileHeaderTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    letterSpacing: 2,
+    color: '#000',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  settingsButton: {
+    padding: 4,
   },
   backIconButton: {
     position: 'absolute',
@@ -1160,33 +1176,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
   },
   editProfileButton: {
-    width: '48%',
+    width: '100%',
     borderWidth: 1,
     borderColor: '#000',
-    paddingVertical: 10,
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   editProfileText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
-    letterSpacing: 1,
-  },
-  profileButtonsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignSelf: 'stretch',
-  },
-  savedButton: {
-    width: '48%',
-    borderWidth: 1,
-    borderColor: '#000',
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  savedButtonText: {
     fontSize: 12,
     fontWeight: '500',
     color: '#000',
@@ -1471,58 +1468,34 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 
-  // Insights Tab
-  insightsContainer: {
+  // Saved Tab
+  savedTabContainer: {
     padding: 24,
+    alignItems: 'center',
   },
-  insightsTitle: {
-    fontSize: 16,
+  viewSavedButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 16,
+    width: '100%',
+    gap: 12,
+  },
+  viewSavedText: {
+    flex: 1,
+    fontSize: 15,
     fontWeight: '500',
     color: '#000',
-    marginBottom: 20,
-    textAlign: 'center',
   },
-  insightsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
-  },
-  insightCard: {
-    width: '47%',
-    backgroundColor: '#f8f8f8',
-    padding: 20,
-    alignItems: 'center',
-    borderRadius: 8,
-  },
-  insightValue: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#000',
-  },
-  insightLabel: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#666',
-    marginTop: 6,
-    textAlign: 'center',
-  },
-  insightsTip: {
-    backgroundColor: '#f0f0f0',
-    padding: 20,
-    borderRadius: 8,
-  },
-  tipTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 8,
-  },
-  tipText: {
+  savedHint: {
     fontSize: 13,
     fontWeight: '300',
-    color: '#666',
-    lineHeight: 20,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 16,
   },
 
   // Empty States

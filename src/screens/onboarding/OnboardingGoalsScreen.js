@@ -16,7 +16,6 @@ import {
 const wordmarkBlack = require('../../../assets/wordmark_black.png');
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
-import { useProfile } from '../../hooks/useProfile';
 import { useGoals } from '../../hooks/useGoals';
 import { onboardingColors, onboardingTypography } from '../../constants/onboardingTheme';
 import OnboardingProgress from '../../components/OnboardingProgress';
@@ -46,18 +45,9 @@ const GOAL_TYPES = [
 
 export default function OnboardingGoalsScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
-  const { user, updateProfile } = useAuth();
-  const { uploadAvatar } = useProfile(user?.id);
+  const { updateProfile } = useAuth();
+  const { user } = useAuth();
   const { createGoal } = useGoals(user?.id);
-
-  const {
-    displayName,
-    locationCity,
-    locationRegion,
-    locationLat,
-    locationLng,
-    photoUri,
-  } = route.params || {};
 
   const [goalTitle, setGoalTitle] = useState('');
   const [goalType, setGoalType] = useState(null);
@@ -65,43 +55,25 @@ export default function OnboardingGoalsScreen({ navigation, route }) {
 
   const isValid = goalTitle.trim().length >= 2 && goalType !== null;
 
+  const completeOnboarding = async () => {
+    const profileResult = await updateProfile({
+      onboarding_complete: true,
+    });
+
+    if (profileResult.error) {
+      Alert.alert('Error', profileResult.error.message || 'Failed to complete setup');
+      return false;
+    }
+    return true;
+  };
+
   const handleComplete = async () => {
     if (!isValid) return;
 
     setLoading(true);
 
     try {
-      // 1. Upload avatar if selected
-      if (photoUri) {
-        const avatarResult = await uploadAvatar(photoUri);
-        if (avatarResult.error) {
-          console.warn('Avatar upload failed:', avatarResult.error);
-          // Continue anyway - avatar is optional
-        }
-      }
-
-      // 2. Update profile with display name, location, and mark onboarding complete
-      const profileUpdates = {
-        display_name: displayName,
-        onboarding_complete: true,
-      };
-
-      if (locationCity) {
-        profileUpdates.location_enabled = true;
-        profileUpdates.location_city = locationCity;
-        profileUpdates.location_region = locationRegion || null;
-        profileUpdates.location_lat = locationLat || null;
-        profileUpdates.location_lng = locationLng || null;
-      }
-
-      const profileResult = await updateProfile(profileUpdates);
-      if (profileResult.error) {
-        Alert.alert('Error', profileResult.error.message || 'Failed to save profile');
-        setLoading(false);
-        return;
-      }
-
-      // 3. Create the first goal
+      // Create the goal
       const goalResult = await createGoal({
         title: goalTitle.trim(),
         goal_type: goalType,
@@ -110,14 +82,32 @@ export default function OnboardingGoalsScreen({ navigation, route }) {
 
       if (goalResult.error) {
         console.warn('Goal creation failed:', goalResult.error);
-        // Continue anyway - we've already marked onboarding complete
+        // Continue anyway
       }
 
-      // 4. Navigation happens automatically
-      // AppNavigator checks profile.onboarding_complete and switches to AppStack
-      // No manual navigation needed - the profile update triggers re-render
+      // Mark onboarding complete
+      await completeOnboarding();
+
+      // Navigation happens automatically via AppNavigator
     } catch (err) {
       console.error('Onboarding completion error:', err);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  const handleSkip = async () => {
+    setLoading(true);
+
+    try {
+      // Just mark onboarding complete without creating a goal
+      const success = await completeOnboarding();
+      if (!success) {
+        setLoading(false);
+      }
+      // Navigation happens automatically via AppNavigator
+    } catch (err) {
+      console.error('Skip error:', err);
       Alert.alert('Error', 'Something went wrong. Please try again.');
       setLoading(false);
     }
@@ -134,17 +124,17 @@ export default function OnboardingGoalsScreen({ navigation, route }) {
       </View>
 
       {/* Progress Bar */}
-      <OnboardingProgress progress={0.8} />
+      <OnboardingProgress progress={0.9} />
 
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 100 }]}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 120 }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.heading}>Create your first goal</Text>
         <Text style={styles.subheading}>
-          What do you want to work on?
+          What do you want to work on? You can skip this for now.
         </Text>
 
         {/* Goal Title Input */}
@@ -198,7 +188,7 @@ export default function OnboardingGoalsScreen({ navigation, route }) {
         </View>
       </ScrollView>
 
-      {/* Finish Button */}
+      {/* Bottom Buttons */}
       <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 24 }]}>
         <TouchableOpacity
           style={[
@@ -212,8 +202,17 @@ export default function OnboardingGoalsScreen({ navigation, route }) {
           {loading ? (
             <ActivityIndicator color={onboardingColors.white} size="small" />
           ) : (
-            <Text style={styles.finishButtonText}>Finish</Text>
+            <Text style={styles.finishButtonText}>Create Goal</Text>
           )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.skipButton}
+          onPress={handleSkip}
+          disabled={loading}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.skipButtonText}>Skip for now</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -322,5 +321,16 @@ const styles = StyleSheet.create({
   finishButtonText: {
     ...onboardingTypography.button,
     color: onboardingColors.white,
+  },
+  skipButton: {
+    marginTop: 12,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  skipButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: onboardingColors.textMuted,
   },
 });

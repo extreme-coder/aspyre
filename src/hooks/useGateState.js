@@ -2,23 +2,33 @@ import { useState, useEffect, useCallback } from 'react';
 import { AppState } from 'react-native';
 import { useJournal } from './useJournal';
 import { useFeedUsage } from './useFeedUsage';
+import { useProfile } from './useProfile';
 
 /**
  * Gate states for the home screen
+ *
+ * Soft Gate Logic:
+ * - PREVIEW_MODE: New users (has_ever_posted = false) get limited Discover preview
+ * - NEEDS_POST: Active users who haven't posted today - Friends feed only
+ * - FEED_UNLOCKED: Posted today - full feed access
+ * - TIME_LIMIT_REACHED: Feed time exhausted
  */
 export const GateState = {
   LOADING: 'LOADING',
-  NEEDS_POST: 'NEEDS_POST',
+  PREVIEW_MODE: 'PREVIEW_MODE',  // New users - limited preview
+  NEEDS_POST: 'NEEDS_POST',       // Active users - Friends only
   FEED_UNLOCKED: 'FEED_UNLOCKED',
   TIME_LIMIT_REACHED: 'TIME_LIMIT_REACHED',
 };
 
 /**
  * Hook that computes the current gate state based on journal and feed usage.
- * Recomputes on app resume.
+ * Implements soft gate: new users get preview, active users must post daily.
  */
 export function useGateState(userId, userTimezone) {
   const [gateState, setGateState] = useState(GateState.LOADING);
+
+  const { profile, loading: profileLoading } = useProfile(userId);
 
   const {
     hasPostedToday,
@@ -38,7 +48,8 @@ export function useGateState(userId, userTimezone) {
     isTracking,
   } = useFeedUsage(userId, userTimezone);
 
-  const loading = journalLoading || feedLoading;
+  const loading = journalLoading || feedLoading || profileLoading;
+  const hasEverPosted = profile?.has_ever_posted ?? false;
 
   // Compute gate state
   const computeState = useCallback(() => {
@@ -46,19 +57,24 @@ export function useGateState(userId, userTimezone) {
       return GateState.LOADING;
     }
 
-    // Check time limit first (highest priority)
-    if (isTimeLimitReached) {
+    // Check time limit first (highest priority) - only for users who have posted
+    if (hasEverPosted && isTimeLimitReached) {
       return GateState.TIME_LIMIT_REACHED;
     }
 
-    // Check if user has posted today
+    // New users who have never posted get preview mode
+    if (!hasEverPosted) {
+      return GateState.PREVIEW_MODE;
+    }
+
+    // Active users who haven't posted today
     if (!hasPostedToday) {
       return GateState.NEEDS_POST;
     }
 
-    // User has posted and has time remaining
+    // User has posted today and has time remaining
     return GateState.FEED_UNLOCKED;
-  }, [loading, isTimeLimitReached, hasPostedToday]);
+  }, [loading, isTimeLimitReached, hasPostedToday, hasEverPosted]);
 
   // Update state when dependencies change
   useEffect(() => {

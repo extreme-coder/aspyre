@@ -30,9 +30,13 @@ export default function FeedCard({
   onReport,
   onPress, // Navigate to detail view
   onAuthorPress, // Navigate to author profile
+  showAddFriend = false, // Show add friend button for non-friends
+  onFriendRequestSent, // Callback when friend request is sent
 }) {
   const [kudosLoading, setKudosLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [friendRequestLoading, setFriendRequestLoading] = useState(false);
+  const [friendRequestSent, setFriendRequestSent] = useState(false);
 
   const {
     id,
@@ -210,6 +214,43 @@ export default function FeedCard({
     );
   };
 
+  // Send friend request
+  const handleSendFriendRequest = async () => {
+    if (friendRequestLoading || friendRequestSent) return;
+    setFriendRequestLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('friend_requests')
+        .insert({
+          from_user_id: userId,
+          to_user_id: authorId,
+          status: 'pending',
+        });
+
+      if (error) {
+        if (error.message?.includes('must post at least once')) {
+          Alert.alert('Post First', 'Share your first journal entry before adding friends.');
+        } else if (error.message?.includes('limit reached')) {
+          Alert.alert('Limit Reached', 'You\'ve sent too many friend requests today. Try again tomorrow.');
+        } else if (error.code === '23505') {
+          // Duplicate - request already exists
+          setFriendRequestSent(true);
+        } else {
+          throw error;
+        }
+      } else {
+        setFriendRequestSent(true);
+        onFriendRequestSent && onFriendRequestSent(authorId);
+      }
+    } catch (err) {
+      console.warn('Friend request error:', err);
+      Alert.alert('Error', 'Could not send friend request. Please try again.');
+    } finally {
+      setFriendRequestLoading(false);
+    }
+  };
+
   // Determine if this is new format (has headline or media) or legacy
   const isNewFormat = !!(headline || imageUrl);
 
@@ -267,6 +308,28 @@ export default function FeedCard({
             </View>
           </TouchableOpacity>
           <View style={styles.headerRight}>
+            {/* Add Friend Button */}
+            {showAddFriend && authorId !== userId && (
+              <TouchableOpacity
+                style={[
+                  styles.addFriendButton,
+                  friendRequestSent && styles.addFriendButtonSent,
+                ]}
+                onPress={handleSendFriendRequest}
+                disabled={friendRequestLoading || friendRequestSent}
+              >
+                {friendRequestLoading ? (
+                  <Text style={styles.addFriendButtonText}>...</Text>
+                ) : friendRequestSent ? (
+                  <Text style={[styles.addFriendButtonText, styles.addFriendButtonTextSent]}>Sent</Text>
+                ) : (
+                  <>
+                    <Ionicons name="person-add-outline" size={12} color="#fff" />
+                    <Text style={styles.addFriendButtonText}>Add</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            )}
             <Text style={styles.timestamp}>{formatDate(created_at)}</Text>
             <TouchableOpacity
               style={styles.moreButton}
@@ -505,5 +568,25 @@ const styles = StyleSheet.create({
   },
   actionCountActive: {
     color: '#000',
+  },
+  addFriendButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#000',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 4,
+  },
+  addFriendButtonSent: {
+    backgroundColor: '#e0e0e0',
+  },
+  addFriendButtonText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  addFriendButtonTextSent: {
+    color: '#666',
   },
 });
