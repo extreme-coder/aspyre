@@ -23,6 +23,15 @@ import ReportModal from '../components/ReportModal';
 import NotificationBadge from '../components/NotificationBadge';
 import OfflineBanner from '../components/OfflineBanner';
 import { Ionicons } from '@expo/vector-icons';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+  editorialMargins,
+  components,
+} from '../constants/theme';
 
 const FILTER_OPTIONS = [
   { key: FeedFilter.DISCOVER, label: 'Discover' },
@@ -217,7 +226,7 @@ export default function GateScreen({ navigation }) {
     if (!loadingMore) return null;
     return (
       <View style={styles.loadingMore}>
-        <ActivityIndicator size="small" color="#000" />
+        <ActivityIndicator size="small" color={colors.primary} />
       </View>
     );
   };
@@ -263,7 +272,7 @@ export default function GateScreen({ navigation }) {
 
     return (
       <View style={styles.emptyState}>
-        <Ionicons name={icon} size={48} color="#ccc" style={styles.emptyStateIcon} />
+        <Ionicons name={icon} size={48} color={colors.outlineVariant} style={styles.emptyStateIcon} />
         <Text style={styles.emptyStateTitle}>{message}</Text>
         {subtitle && <Text style={styles.emptyStateSubtitle}>{subtitle}</Text>}
         {buttonText && onButtonPress && (
@@ -280,7 +289,7 @@ export default function GateScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -394,7 +403,7 @@ export default function GateScreen({ navigation }) {
         {/* Feed Content */}
         {feedLoading && journals.length === 0 ? (
           <View style={styles.feedLoadingContainer}>
-            <ActivityIndicator size="large" color="#000" />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : feedError ? (
           <View style={styles.errorContainer}>
@@ -413,7 +422,7 @@ export default function GateScreen({ navigation }) {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={handleRefresh}
-                tintColor="#000"
+                tintColor={colors.onSurface}
               />
             }
             onEndReached={!isPreviewMode ? loadMore : undefined}
@@ -459,168 +468,167 @@ export default function GateScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingLeft: editorialMargins.left,
+    paddingRight: editorialMargins.right,
+    paddingVertical: spacing.md,
   },
   headerLeft: {
     width: 44,
   },
   headerTitle: {
+    fontFamily: fontFamily.semiBold,
     fontSize: 14,
-    fontWeight: '300',
     letterSpacing: 4,
-    color: '#000',
+    color: colors.primary,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: spacing.xxl,
   },
   logo: {
+    fontFamily: fontFamily.bold,
     fontSize: 28,
-    fontWeight: '300',
     letterSpacing: 8,
-    color: '#000',
-    marginBottom: 48,
+    color: colors.primary,
+    marginBottom: spacing.xxxl,
   },
   greeting: {
-    fontSize: 24,
-    fontWeight: '200',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.headlineMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
-    marginBottom: 8,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
   },
   subtitle: {
-    fontSize: 14,
-    fontWeight: '300',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    lineHeight: typography.bodyMd.lineHeight,
     letterSpacing: 0.5,
-    color: '#666',
-    marginBottom: 32,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.xxl,
     textAlign: 'center',
   },
   primaryButton: {
-    backgroundColor: '#000',
-    paddingVertical: 16,
-    paddingHorizontal: 48,
-    marginBottom: 16,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xxxl,
+    borderRadius: radius.xl,
+    marginBottom: spacing.lg,
   },
   primaryButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onPrimary,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 2,
   },
   secondaryButton: {
-    borderWidth: 1,
-    borderColor: '#000',
+    backgroundColor: colors.surfaceContainerHighest,
     paddingVertical: 14,
-    paddingHorizontal: 32,
-    marginBottom: 12,
+    paddingHorizontal: spacing.xxl,
+    borderRadius: radius.xl,
+    marginBottom: spacing.md,
   },
   secondaryButtonText: {
-    color: '#000',
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    color: colors.onSurface,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 2,
   },
   tertiaryButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
   },
   tertiaryButtonText: {
-    color: '#666',
-    fontSize: 12,
-    fontWeight: '400',
+    fontFamily: fontFamily.regular,
+    color: colors.primary,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
   },
   secondaryActions: {
-    marginTop: 16,
+    marginTop: spacing.lg,
   },
   linkButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
   },
   linkButtonText: {
-    color: '#666',
-    fontSize: 12,
-    fontWeight: '400',
+    fontFamily: fontFamily.regular,
+    color: colors.onSurfaceVariant,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
   },
   explainer: {
     position: 'absolute',
     bottom: 60,
-    left: 32,
-    right: 32,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    paddingTop: 20,
+    left: spacing.xxl,
+    right: spacing.xxl,
+    paddingTop: spacing.xl,
   },
   explainerText: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodySm.fontSize,
+    lineHeight: typography.bodySm.lineHeight,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
-    lineHeight: 18,
   },
   // Time's Up styles
   timesUpTitle: {
-    fontSize: 24,
-    fontWeight: '300',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.headlineMd.fontSize,
     letterSpacing: 2,
-    color: '#000',
-    marginBottom: 12,
+    color: colors.onSurface,
+    marginBottom: spacing.md,
   },
   timesUpSubtitle: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    lineHeight: typography.bodyMd.lineHeight,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   resetTime: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#999',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1,
-    marginBottom: 40,
+    marginBottom: spacing.xxxl,
   },
-  // Feed styles
+  // Feed styles - NO borders, use tonal shifts
   filterContainer: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    backgroundColor: colors.surfaceContainerLow,
   },
   filterList: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
   },
   filterChip: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    marginRight: 8,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.surfaceContainer,
+    borderRadius: radius.full,
+    marginRight: spacing.sm,
   },
   filterChipActive: {
-    backgroundColor: '#000',
-    borderColor: '#000',
+    backgroundColor: colors.primary,
   },
   filterChipText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 0.5,
   },
   filterChipTextActive: {
-    color: '#fff',
+    color: colors.onPrimary,
   },
   feedLoadingContainer: {
     flex: 1,
@@ -631,152 +639,153 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: spacing.xl,
   },
   errorText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
-    marginBottom: 16,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.lg,
   },
   retryButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderWidth: 1,
-    borderColor: '#000',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    backgroundColor: colors.surfaceContainerHighest,
+    borderRadius: radius.xl,
   },
   retryButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurface,
     letterSpacing: 1,
   },
   feedContent: {
-    padding: 16,
+    paddingLeft: editorialMargins.left,
+    paddingRight: editorialMargins.right,
+    paddingTop: spacing.lg,
     paddingBottom: 80,
   },
   loadingMore: {
-    paddingVertical: 20,
+    paddingVertical: spacing.xl,
     alignItems: 'center',
   },
   emptyState: {
-    paddingVertical: 60,
+    paddingVertical: spacing.xxxl + spacing.md,
     alignItems: 'center',
   },
   emptyStateIcon: {
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   emptyStateTitle: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#333',
-    marginBottom: 8,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
   },
   emptyStateSubtitle: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    lineHeight: typography.bodyMd.lineHeight,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: spacing.xxl,
   },
   emptyStateButton: {
-    marginTop: 20,
-    backgroundColor: '#000',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    marginTop: spacing.xl,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    borderRadius: radius.xl,
   },
   emptyStateButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onPrimary,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
   },
-  // Preview mode banner (new users)
+  // Preview mode banner (new users) - tonal surface, no borders
   previewBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#f8f8f8',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    backgroundColor: colors.primaryFixed,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   previewBannerText: {
     flex: 1,
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#333',
-    marginRight: 12,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.primary,
+    marginRight: spacing.md,
   },
   previewBannerButton: {
-    backgroundColor: '#000',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.xl,
   },
   previewBannerButtonText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '600',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onPrimary,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 0.5,
   },
-  // Needs post banner (active users)
+  // Needs post banner (active users) - achievement gold tones
   needsPostBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fffdf0',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0e8c0',
+    backgroundColor: colors.tertiaryContainer,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   needsPostBannerText: {
     flex: 1,
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#665500',
-    marginRight: 12,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onTertiaryContainer,
+    marginRight: spacing.md,
   },
   needsPostBannerButton: {
-    backgroundColor: '#000',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
+    backgroundColor: colors.tertiary,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xl,
+    borderRadius: radius.xl,
   },
   needsPostBannerButtonText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '600',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onTertiary,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 0.5,
   },
-  // Preview mode footer
+  // Preview mode footer - glass effect with tonal surface
   previewFooter: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    backgroundColor: colors.surfaceContainerLow,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
     alignItems: 'center',
   },
   previewFooterText: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#666',
-    marginBottom: 12,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.md,
   },
   previewFooterButton: {
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
-    paddingHorizontal: 48,
+    paddingHorizontal: spacing.xxxl,
+    borderRadius: radius.xl,
   },
   previewFooterButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onPrimary,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
   },
 });

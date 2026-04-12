@@ -11,6 +11,13 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
+import {
   runScreenshotTour,
   captureCurrentScreen,
   SCREENSHOT_SCREENS,
@@ -101,7 +108,7 @@ export default function DevToolsScreen({ navigation }) {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color={colors.onSurface} />
         </TouchableOpacity>
         <Text style={styles.title}>Dev Tools</Text>
         <View style={styles.placeholder} />
@@ -118,7 +125,7 @@ export default function DevToolsScreen({ navigation }) {
             onPress={handleCaptureNow}
             disabled={isRunning}
           >
-            <Ionicons name="camera-outline" size={20} color="#fff" />
+            <Ionicons name="camera-outline" size={20} color={colors.onPrimary} />
             <Text style={styles.buttonText}>Capture This Screen</Text>
           </TouchableOpacity>
 
@@ -128,7 +135,7 @@ export default function DevToolsScreen({ navigation }) {
             onPress={handleCaptureWithName}
             disabled={isRunning}
           >
-            <Ionicons name="create-outline" size={20} color="#000" />
+            <Ionicons name="create-outline" size={20} color={colors.onSurface} />
             <Text style={[styles.buttonText, styles.buttonTextSecondary]}>
               Capture with Custom Name
             </Text>
@@ -142,12 +149,12 @@ export default function DevToolsScreen({ navigation }) {
           >
             {isRunning ? (
               <>
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size="small" color={colors.onPrimary} />
                 <Text style={styles.buttonText}>Running Tour...</Text>
               </>
             ) : (
               <>
-                <Ionicons name="albums-outline" size={20} color="#fff" />
+                <Ionicons name="albums-outline" size={20} color={colors.onPrimary} />
                 <Text style={styles.buttonText}>
                   Run Full Screenshot Tour ({SCREENSHOT_SCREENS.length} screens)
                 </Text>
@@ -209,7 +216,7 @@ export default function DevToolsScreen({ navigation }) {
                 style={styles.goButton}
                 onPress={() => navigation.navigate(screen.route, screen.params)}
               >
-                <Ionicons name="arrow-forward" size={16} color="#666" />
+                <Ionicons name="arrow-forward" size={16} color={colors.onSurfaceVariant} />
               </TouchableOpacity>
             </View>
           ))}
@@ -253,21 +260,20 @@ export default function DevToolsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surfaceContainerLow,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurface,
   },
   placeholder: {
     width: 24,
@@ -276,163 +282,171 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    padding: spacing.lg,
+    backgroundColor: colors.surfaceContainerLowest,
+    marginBottom: spacing.sm,
   },
   sectionTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#999',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1,
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
-    backgroundColor: '#333',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginBottom: 12,
+    gap: spacing.sm,
+    backgroundColor: colors.surfaceContainerHigh,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.lg,
+    marginBottom: spacing.md,
   },
   buttonPrimary: {
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
   },
   buttonSecondary: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: colors.surfaceContainerLow,
   },
   buttonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onPrimary,
   },
   buttonTextSecondary: {
-    color: '#000',
+    color: colors.onSurface,
   },
   progressContainer: {
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#eee',
-    borderRadius: 2,
+    backgroundColor: colors.surfaceContainerHigh,
+    borderRadius: radius.full,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
   },
   progressText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 8,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.sm,
     textAlign: 'center',
   },
   resultsContainer: {
-    marginTop: 16,
-    padding: 16,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
+    marginTop: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
   },
   resultsTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 8,
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
   },
   resultsText: {
-    fontSize: 13,
-    color: '#666',
-    marginBottom: 4,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.xs,
   },
   failedList: {
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   failedItem: {
-    fontSize: 11,
-    color: '#c00',
-    marginBottom: 2,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.error,
+    marginBottom: spacing.xs,
   },
   screenItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.md,
   },
   screenNumber: {
+    fontFamily: fontFamily.semiBold,
     width: 24,
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#999',
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   screenInfo: {
     flex: 1,
   },
   screenName: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
   screenRoute: {
-    fontSize: 11,
-    color: '#999',
-    marginTop: 2,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   goButton: {
-    padding: 8,
+    padding: spacing.sm,
   },
   guideText: {
-    fontSize: 13,
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
     lineHeight: 20,
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   manualList: {
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   manualItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.md,
   },
   manualItemNumber: {
+    fontFamily: fontFamily.semiBold,
     width: 24,
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#999',
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   manualItemInfo: {
     flex: 1,
   },
   manualItemName: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#333',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurface,
   },
   manualItemHint: {
-    fontSize: 10,
-    color: '#999',
-    marginTop: 2,
-    fontFamily: 'monospace',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   totalText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurface,
     textAlign: 'center',
   },
   totalSubtext: {
-    fontSize: 12,
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
 });

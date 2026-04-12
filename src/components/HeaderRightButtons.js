@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import NotificationBadge from './NotificationBadge';
 import HeaderProfileButton from './HeaderProfileButton';
+import { spacing } from '../constants/theme';
 
 /**
  * Combined header right buttons: notification bell + profile avatar.
@@ -20,6 +21,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
 });

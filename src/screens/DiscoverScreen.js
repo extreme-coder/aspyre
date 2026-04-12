@@ -16,6 +16,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useDiscoverUsers } from '../hooks/useDiscoverUsers';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 export default function DiscoverScreen({ navigation }) {
   const { user } = useAuth();
@@ -88,7 +95,7 @@ export default function DiscoverScreen({ navigation }) {
     if (isProcessing) {
       return (
         <View style={styles.actionButton}>
-          <ActivityIndicator size="small" color="#000" />
+          <ActivityIndicator size="small" color={colors.onSurface} />
         </View>
       );
     }
@@ -97,7 +104,7 @@ export default function DiscoverScreen({ navigation }) {
       case 'friends':
         return (
           <View style={[styles.actionButton, styles.friendsButton]}>
-            <Ionicons name="checkmark" size={14} color="#666" />
+            <Ionicons name="checkmark" size={14} color={colors.onSurfaceVariant} />
             <Text style={styles.friendsButtonText}>Friends</Text>
           </View>
         );
@@ -128,7 +135,7 @@ export default function DiscoverScreen({ navigation }) {
             style={[styles.actionButton, styles.addButton]}
             onPress={() => handleSendRequest(profile.id, profile.display_name || profile.handle)}
           >
-            <Ionicons name="person-add-outline" size={14} color="#fff" />
+            <Ionicons name="person-add-outline" size={14} color={colors.onPrimary} />
             <Text style={styles.addButtonText}>Add</Text>
           </TouchableOpacity>
         );
@@ -155,7 +162,7 @@ export default function DiscoverScreen({ navigation }) {
           )}
           {location && (
             <View style={styles.locationRow}>
-              <Ionicons name="location-outline" size={12} color="#999" />
+              <Ionicons name="location-outline" size={12} color={colors.onSurfaceVariant} />
               <Text style={styles.locationText}>{location}</Text>
             </View>
           )}
@@ -171,7 +178,7 @@ export default function DiscoverScreen({ navigation }) {
     if (searchQuery.trim()) {
       return (
         <View style={styles.emptyState}>
-          <Ionicons name="search-outline" size={48} color="#ccc" />
+          <Ionicons name="search-outline" size={48} color={colors.onSurfaceVariant} />
           <Text style={styles.emptyTitle}>No results found</Text>
           <Text style={styles.emptySubtitle}>
             Try a different name or handle
@@ -182,7 +189,7 @@ export default function DiscoverScreen({ navigation }) {
 
     return (
       <View style={styles.emptyState}>
-        <Ionicons name="people-outline" size={48} color="#ccc" />
+        <Ionicons name="people-outline" size={48} color={colors.onSurfaceVariant} />
         <Text style={styles.emptyTitle}>No one to discover yet</Text>
         <Text style={styles.emptySubtitle}>
           Check back soon as more people join
@@ -195,7 +202,7 @@ export default function DiscoverScreen({ navigation }) {
     if (!hasMore || !loading) return null;
     return (
       <View style={styles.footer}>
-        <ActivityIndicator size="small" color="#000" />
+        <ActivityIndicator size="small" color={colors.onSurface} />
       </View>
     );
   };
@@ -205,7 +212,7 @@ export default function DiscoverScreen({ navigation }) {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color={colors.onSurface} />
         </TouchableOpacity>
         <Text style={styles.title}>Discover</Text>
         <View style={styles.placeholder} />
@@ -213,11 +220,11 @@ export default function DiscoverScreen({ navigation }) {
 
       {/* Search Input */}
       <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={18} color="#999" style={styles.searchIcon} />
+        <Ionicons name="search-outline" size={18} color={colors.onSurfaceVariant} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search by name or @handle"
-          placeholderTextColor="#999"
+          placeholderTextColor={colors.onSurfaceVariant}
           value={searchQuery}
           onChangeText={searchUsers}
           autoCapitalize="none"
@@ -225,7 +232,7 @@ export default function DiscoverScreen({ navigation }) {
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => searchUsers('')}>
-            <Ionicons name="close-circle" size={18} color="#999" />
+            <Ionicons name="close-circle" size={18} color={colors.onSurfaceVariant} />
           </TouchableOpacity>
         )}
       </View>
@@ -251,7 +258,7 @@ export default function DiscoverScreen({ navigation }) {
             <RefreshControl
               refreshing={loading && users.length === 0}
               onRefresh={refresh}
-              tintColor="#000"
+              tintColor={colors.primary}
             />
           }
           onEndReached={loadMore}
@@ -267,20 +274,20 @@ export default function DiscoverScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
   title: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   placeholder: {
     width: 24,
@@ -288,162 +295,160 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 20,
-    marginBottom: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
-    color: '#000',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     padding: 0,
   },
   listContent: {
-    paddingBottom: 40,
+    paddingBottom: spacing.xl,
   },
   userItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surface,
   },
   avatar: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: radius.full,
   },
   avatarPlaceholder: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    backgroundColor: '#f0f0f0',
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceContainerHigh,
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarText: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   userInfo: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: spacing.md,
   },
   userName: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
   userHandle: {
-    fontSize: 13,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
     marginTop: 2,
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
   locationText: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#999',
-    marginLeft: 4,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginLeft: spacing.xs,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 4,
-    gap: 4,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.xl,
+    gap: spacing.xs,
   },
   addButton: {
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
   },
   addButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#fff',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onPrimary,
   },
   pendingButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: colors.surfaceContainerHigh,
   },
   pendingButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   friendsButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: colors.secondaryContainer,
   },
   friendsButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSecondaryContainer,
   },
   acceptButton: {
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
   },
   acceptButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#fff',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onPrimary,
   },
   emptyState: {
-    padding: 48,
+    padding: spacing.xl,
     alignItems: 'center',
   },
   emptyTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-    marginTop: 16,
-    marginBottom: 8,
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.onSurface,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
   emptySubtitle: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
   },
   footer: {
-    paddingVertical: 20,
+    paddingVertical: spacing.lg,
     alignItems: 'center',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: spacing.lg,
   },
   errorText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
-    marginBottom: 16,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.lg,
   },
   retryButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderWidth: 1,
-    borderColor: '#000',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.surfaceContainerHigh,
+    borderRadius: radius.xl,
   },
   retryButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurface,
     letterSpacing: 1,
   },
 });

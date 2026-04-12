@@ -21,6 +21,13 @@ import { useJournal } from '../hooks/useJournal';
 import { useGoals } from '../hooks/useGoals';
 import { useProfile } from '../hooks/useProfile';
 import { formatDateForDisplay } from '../utils/dateUtils';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 const PRIVACY_OPTIONS = [
   { value: 'everyone', label: 'Everyone' },
@@ -375,7 +382,7 @@ export default function JournalComposeScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loading}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -524,7 +531,7 @@ export default function JournalComposeScreen({ navigation }) {
             }}
           >
             {isEditing ? (
-              <Ionicons name="close" size={24} color="#666" />
+              <Ionicons name="close" size={24} color={colors.onSurfaceVariant} />
             ) : (
               <View style={{ width: 24 }} />
             )}
@@ -532,7 +539,7 @@ export default function JournalComposeScreen({ navigation }) {
           <Text style={styles.dateText}>{formatDateForDisplay(localDate)}</Text>
           <TouchableOpacity onPress={handleSave} disabled={saving || uploadingImage}>
             {saving || uploadingImage ? (
-              <ActivityIndicator size="small" color="#000" />
+              <ActivityIndicator size="small" color={colors.primary} />
             ) : (
               <Text style={styles.saveButton}>{isEditing ? 'Save' : 'Post'}</Text>
             )}
@@ -559,7 +566,7 @@ export default function JournalComposeScreen({ navigation }) {
               value={body}
               onChangeText={setBody}
               placeholder="What did you work on today?"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
               multiline
               autoFocus={!hasPostedToday}
             />
@@ -634,13 +641,13 @@ export default function JournalComposeScreen({ navigation }) {
               <View style={styles.photoPreview}>
                 <Image source={{ uri: mediaUri }} style={styles.photoImage} />
                 <View style={styles.photoOverlay}>
-                  <Ionicons name="camera-outline" size={20} color="#fff" />
+                  <Ionicons name="camera-outline" size={20} color={colors.onPrimary} />
                   <Text style={styles.photoChangeText}>Change</Text>
                 </View>
               </View>
             ) : (
               <View style={styles.photoPlaceholder}>
-                <Ionicons name="camera-outline" size={24} color="#666" />
+                <Ionicons name="camera-outline" size={24} color={colors.onSurfaceVariant} />
                 <Text style={styles.photoPlaceholderText}>Add photo (optional)</Text>
               </View>
             )}
@@ -693,7 +700,7 @@ export default function JournalComposeScreen({ navigation }) {
             <Ionicons
               name={showMoreDetails ? 'chevron-up' : 'chevron-down'}
               size={18}
-              color="#666"
+              color={colors.onSurfaceVariant}
             />
           </TouchableOpacity>
 
@@ -707,7 +714,7 @@ export default function JournalComposeScreen({ navigation }) {
                   value={challenge}
                   onChangeText={setChallenge}
                   placeholder="What was hard?"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.onSurfaceVariant}
                   multiline
                 />
               </View>
@@ -720,7 +727,7 @@ export default function JournalComposeScreen({ navigation }) {
                   value={win}
                   onChangeText={setWin}
                   placeholder="What went well?"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.onSurfaceVariant}
                   multiline
                 />
               </View>
@@ -733,7 +740,7 @@ export default function JournalComposeScreen({ navigation }) {
                   value={tomorrow}
                   onChangeText={setTomorrow}
                   placeholder="What's next?"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.onSurfaceVariant}
                 />
               </View>
 
@@ -743,7 +750,7 @@ export default function JournalComposeScreen({ navigation }) {
                 onPress={() => setOpenToAdvice(!openToAdvice)}
               >
                 <View style={[styles.checkbox, openToAdvice && styles.checkboxChecked]}>
-                  {openToAdvice && <Ionicons name="checkmark" size={14} color="#fff" />}
+                  {openToAdvice && <Ionicons name="checkmark" size={14} color={colors.onPrimary} />}
                 </View>
                 <Text style={styles.checkboxLabel}>Open to advice</Text>
               </TouchableOpacity>
@@ -766,7 +773,7 @@ export default function JournalComposeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   keyboardView: {
     flex: 1,
@@ -780,28 +787,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surfaceContainerLow,
   },
   dateText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#333',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurface,
     letterSpacing: 0.5,
   },
   saveButton: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#000',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.primary,
     minWidth: 50,
     textAlign: 'right',
   },
   editButton: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#000',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.primary,
     minWidth: 50,
     textAlign: 'right',
   },
@@ -809,145 +815,137 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 10,
-    backgroundColor: '#fafafa',
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.tertiaryContainer,
   },
   editNoticeText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onTertiaryContainer,
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 40,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
   },
 
   // Fields
   field: {
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   label: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 1,
-    color: '#444',
+    color: colors.onSurfaceVariant,
     textTransform: 'uppercase',
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
 
   // Body input
   bodyInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 16,
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#000',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurface,
     minHeight: 120,
     textAlignVertical: 'top',
     lineHeight: 24,
   },
   charCount: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'right',
-    marginTop: 6,
+    marginTop: spacing.xs,
   },
   charCountWarning: {
-    color: '#f59e0b',
+    color: colors.tertiary,
   },
 
   // Pickers
   picker: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 14,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.md,
   },
   pickerText: {
-    fontSize: 15,
-    fontWeight: '400',
-    color: '#000',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
   pickerPlaceholder: {
-    color: '#888',
+    color: colors.onSurfaceVariant,
   },
   pickerOptions: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderTopWidth: 0,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
+    backgroundColor: colors.surfaceContainerHigh,
+    borderBottomLeftRadius: radius.lg,
+    borderBottomRightRadius: radius.lg,
     overflow: 'hidden',
+    marginTop: -radius.lg,
+    paddingTop: radius.lg,
   },
   pickerOption: {
-    padding: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    padding: spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   pickerOptionActive: {
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
   },
   pickerOptionText: {
-    fontSize: 15,
-    fontWeight: '400',
-    color: '#000',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
   pickerOptionTextActive: {
-    color: '#fff',
+    color: colors.onPrimary,
   },
   pickerOptionType: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#888',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     textTransform: 'capitalize',
   },
   noGoalPrompt: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderStyle: 'dashed',
-    borderRadius: 8,
-    padding: 14,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.md,
   },
   noGoalText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#888',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
   },
 
   // Photo button
   photoButton: {
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   photoPlaceholder: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderStyle: 'dashed',
-    borderRadius: 8,
-    padding: 16,
-    gap: 10,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    gap: spacing.sm,
   },
   photoPlaceholderText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   photoPreview: {
     position: 'relative',
-    borderRadius: 8,
+    borderRadius: radius.lg,
     overflow: 'hidden',
   },
   photoImage: {
@@ -963,13 +961,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10,
-    gap: 6,
+    padding: spacing.sm,
+    gap: spacing.xs,
   },
   photoChangeText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#fff',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onPrimary,
   },
 
   // More details toggle
@@ -977,41 +975,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    marginTop: 8,
-    gap: 6,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    marginTop: spacing.sm,
+    gap: spacing.xs,
   },
   moreDetailsToggleText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
 
   // More details section
   moreDetailsSection: {
-    paddingTop: 16,
+    paddingTop: spacing.lg,
   },
   detailField: {
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   detailLabel: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 1,
-    color: '#666',
+    color: colors.onSurfaceVariant,
     textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   detailInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 14,
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#000',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     minHeight: 60,
     textAlignVertical: 'top',
   },
@@ -1020,41 +1017,37 @@ const styles = StyleSheet.create({
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    gap: 12,
+    paddingVertical: spacing.md,
+    gap: spacing.md,
   },
   checkbox: {
     width: 22,
     height: 22,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#ddd',
+    borderRadius: radius.sm,
+    backgroundColor: colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#000',
-    borderColor: '#000',
+    backgroundColor: colors.primary,
   },
   checkboxLabel: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#333',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
 
   // Error
   errorContainer: {
-    backgroundColor: '#fef2f2',
-    padding: 14,
-    marginTop: 20,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#fecaca',
+    backgroundColor: colors.errorContainer,
+    padding: spacing.md,
+    marginTop: spacing.lg,
+    borderRadius: radius.lg,
   },
   errorText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#dc2626',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.error,
     textAlign: 'center',
   },
   bottomSpacer: {
@@ -1063,12 +1056,11 @@ const styles = StyleSheet.create({
 
   // Preview styles
   previewContent: {
-    padding: 20,
+    padding: spacing.lg,
   },
   previewCard: {
-    borderWidth: 1,
-    borderColor: '#e5e5e5',
-    borderRadius: 12,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: radius.lg,
     overflow: 'hidden',
   },
   previewHeroImage: {
@@ -1079,7 +1071,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    padding: 16,
+    padding: spacing.lg,
   },
   authorInfo: {
     flexDirection: 'row',
@@ -1089,93 +1081,90 @@ const styles = StyleSheet.create({
   avatarPlaceholder: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceContainerHigh,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: spacing.md,
   },
   avatarText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#555',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   authorName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#000',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
   goalText: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     marginTop: 2,
   },
   previewBody: {
-    fontSize: 15,
-    fontWeight: '400',
-    color: '#333',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     lineHeight: 22,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
   },
   previewFooter: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
+    padding: spacing.lg,
+    backgroundColor: colors.surfaceContainerLow,
   },
   privacyBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   privacyBadgeLabel: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#888',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   privacyBadgeText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#000',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurface,
   },
   privacyChangeHint: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#555',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.primary,
     textDecorationLine: 'underline',
   },
   previewPickerOptions: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    margin: 16,
+    backgroundColor: colors.surfaceContainerHigh,
+    borderRadius: radius.lg,
+    margin: spacing.lg,
     marginTop: 0,
     overflow: 'hidden',
   },
   previewEditButton: {
-    marginTop: 16,
-    backgroundColor: '#000',
-    borderRadius: 8,
-    paddingVertical: 14,
+    marginTop: spacing.lg,
+    backgroundColor: colors.primary,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
     alignItems: 'center',
   },
   previewEditButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onPrimary,
   },
   viewAllPostsButton: {
-    marginTop: 12,
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 8,
-    paddingVertical: 14,
+    marginTop: spacing.md,
+    backgroundColor: colors.surfaceContainerHigh,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
     alignItems: 'center',
   },
   viewAllPostsButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#000',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
 });

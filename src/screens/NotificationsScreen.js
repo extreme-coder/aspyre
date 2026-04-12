@@ -16,6 +16,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../hooks/useNotifications';
 import { useFriends } from '../hooks/useFriends';
 import { getNotificationNavigation } from '../utils/pushNotifications';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 // Notification type icons (emoji-based for simplicity)
 const NOTIFICATION_ICONS = {
@@ -201,7 +208,7 @@ export default function NotificationsScreen({ navigation }) {
           {isFriendRequest && !wasHandled && (
             <View style={styles.friendRequestActions}>
               {isProcessing ? (
-                <ActivityIndicator size="small" color="#000" />
+                <ActivityIndicator size="small" color={colors.primary} />
               ) : (
                 <>
                   <TouchableOpacity
@@ -224,7 +231,7 @@ export default function NotificationsScreen({ navigation }) {
           {/* Show "Accepted" label if handled */}
           {isFriendRequest && wasHandled && (
             <View style={styles.handledLabel}>
-              <Ionicons name="checkmark-circle" size={14} color="#4CAF50" />
+              <Ionicons name="checkmark-circle" size={14} color={colors.secondary} />
               <Text style={styles.handledLabelText}>Responded</Text>
             </View>
           )}
@@ -261,7 +268,7 @@ export default function NotificationsScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loading}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -274,11 +281,11 @@ export default function NotificationsScreen({ navigation }) {
         <View style={styles.actionBar}>
           {unreadCount > 0 ? (
             <TouchableOpacity style={styles.actionButton} onPress={handleMarkAllRead}>
-              <Ionicons name="checkmark-done-outline" size={18} color="#666" />
+              <Ionicons name="checkmark-done-outline" size={18} color={colors.onSurfaceVariant} />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity style={styles.actionButton} onPress={handleClearAll}>
-              <Ionicons name="trash-outline" size={18} color="#666" />
+              <Ionicons name="trash-outline" size={18} color={colors.onSurfaceVariant} />
             </TouchableOpacity>
           )}
         </View>
@@ -308,16 +315,16 @@ export default function NotificationsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   actionBar: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   actionButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   loading: {
     flex: 1,
@@ -325,29 +332,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   listContent: {
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
   },
   listContentEmpty: {
     flex: 1,
   },
   notificationItem: {
     flexDirection: 'row',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.surface,
   },
   notificationUnread: {
-    backgroundColor: '#fafafa',
+    backgroundColor: colors.surfaceContainerLow,
   },
   iconContainer: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceContainerHigh,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: spacing.md,
   },
   icon: {
     fontSize: 18,
@@ -358,57 +364,57 @@ const styles = StyleSheet.create({
   notificationHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   notificationTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     flex: 1,
   },
   textUnread: {
-    color: '#000',
-    fontWeight: '600',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onSurface,
   },
   unreadDot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
-    backgroundColor: '#000',
-    marginLeft: 8,
+    borderRadius: radius.full,
+    backgroundColor: colors.secondary,
+    marginLeft: spacing.sm,
   },
   notificationBody: {
-    fontSize: 13,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
     lineHeight: 18,
-    marginBottom: 6,
+    marginBottom: spacing.xs,
   },
   notificationTime: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 48,
+    padding: spacing.xl,
   },
   emptyIcon: {
     fontSize: 48,
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   emptyTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 8,
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
   },
   emptySubtitle: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -416,72 +422,72 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 48,
+    padding: spacing.xl,
   },
   errorTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#c00',
-    marginBottom: 8,
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.error,
+    marginBottom: spacing.sm,
   },
   errorMessage: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   retryButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: radius.xl,
   },
   retryButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onPrimary,
     letterSpacing: 1,
   },
   // Inline friend request actions
   friendRequestActions: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 10,
-    marginBottom: 6,
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xs,
   },
   acceptButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.xl,
   },
   acceptButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onPrimary,
   },
   declineButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 4,
+    backgroundColor: colors.surfaceContainerHigh,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.xl,
   },
   declineButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   handledLabel: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginTop: 8,
-    marginBottom: 4,
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xs,
   },
   handledLabelText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#4CAF50',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.secondary,
   },
 });

@@ -14,6 +14,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useFriends } from '../hooks/useFriends';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+  editorialMargins,
+} from '../constants/theme';
 
 const TABS = ['Friends', 'Requests'];
 
@@ -177,7 +185,7 @@ export default function FriendsScreen({ navigation, route }) {
           disabled={isProcessing}
         >
           {isProcessing ? (
-            <ActivityIndicator size="small" color="#999" />
+            <ActivityIndicator size="small" color={colors.onSurfaceVariant} />
           ) : (
             <Text style={styles.removeButtonText}>Remove</Text>
           )}
@@ -209,7 +217,7 @@ export default function FriendsScreen({ navigation, route }) {
         </TouchableOpacity>
         <View style={styles.requestActions}>
           {isProcessing ? (
-            <ActivityIndicator size="small" color="#000" />
+            <ActivityIndicator size="small" color={colors.primary} />
           ) : (
             <>
               <TouchableOpacity
@@ -259,7 +267,7 @@ export default function FriendsScreen({ navigation, route }) {
           disabled={isProcessing}
         >
           {isProcessing ? (
-            <ActivityIndicator size="small" color="#999" />
+            <ActivityIndicator size="small" color={colors.onSurfaceVariant} />
           ) : (
             <Text style={styles.cancelButtonText}>Cancel</Text>
           )}
@@ -272,7 +280,7 @@ export default function FriendsScreen({ navigation, route }) {
     if (friends.length === 0) {
       return (
         <View style={styles.emptyState}>
-          <Ionicons name="people-outline" size={48} color="#ccc" style={styles.emptyIcon} />
+          <Ionicons name="people-outline" size={48} color={colors.outlineVariant} style={styles.emptyIcon} />
           <Text style={styles.emptyTitle}>No friends yet</Text>
           <Text style={styles.emptySubtitle}>
             Discover people with similar goals and interests
@@ -297,7 +305,7 @@ export default function FriendsScreen({ navigation, route }) {
     if (!hasIncoming && !hasOutgoing) {
       return (
         <View style={styles.emptyState}>
-          <Ionicons name="mail-outline" size={48} color="#ccc" style={styles.emptyIcon} />
+          <Ionicons name="mail-outline" size={48} color={colors.outlineVariant} style={styles.emptyIcon} />
           <Text style={styles.emptyTitle}>No pending requests</Text>
           <Text style={styles.emptySubtitle}>
             When you send friend requests or receive them, they'll show up here
@@ -333,11 +341,11 @@ export default function FriendsScreen({ navigation, route }) {
           </TouchableOpacity>
           <Text style={styles.title}>Friends</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Discover')}>
-            <Ionicons name="search-outline" size={20} color="#000" />
+            <Ionicons name="search-outline" size={20} color={colors.primary} />
           </TouchableOpacity>
         </View>
         <View style={styles.loading}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -351,7 +359,7 @@ export default function FriendsScreen({ navigation, route }) {
         </TouchableOpacity>
         <Text style={styles.title}>Friends</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Discover')}>
-          <Ionicons name="search-outline" size={20} color="#000" />
+          <Ionicons name="search-outline" size={20} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -391,26 +399,28 @@ export default function FriendsScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingLeft: editorialMargins.left,
+    paddingRight: editorialMargins.right,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.surfaceContainerLow,
   },
   backButton: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.primary,
     minWidth: 50,
   },
   title: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   placeholder: {
     minWidth: 50,
@@ -422,8 +432,8 @@ const styles = StyleSheet.create({
   },
   tabs: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    backgroundColor: colors.surfaceContainerLow,
+    // NO border - use tonal surface instead
   },
   tab: {
     flex: 1,
@@ -432,41 +442,45 @@ const styles = StyleSheet.create({
   },
   tabActive: {
     borderBottomWidth: 2,
-    borderBottomColor: '#000',
+    borderBottomColor: colors.primary,
   },
   tabText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#999',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   tabTextActive: {
-    color: '#000',
+    color: colors.primary,
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    paddingVertical: 16,
+    paddingVertical: spacing.lg,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: spacing.xl,
   },
   sectionTitle: {
-    fontSize: 10,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 2,
-    color: '#999',
+    color: colors.onSurfaceVariant,
     textTransform: 'uppercase',
-    paddingHorizontal: 24,
-    marginBottom: 12,
+    paddingLeft: editorialMargins.left,
+    paddingRight: editorialMargins.right,
+    marginBottom: spacing.md,
   },
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    paddingLeft: editorialMargins.left,
+    paddingRight: editorialMargins.right,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surfaceContainerLowest,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+    borderRadius: radius.lg,
   },
   itemLeft: {
     flexDirection: 'row',
@@ -474,120 +488,120 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.surfaceContainerHigh,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: spacing.md,
   },
   avatarText: {
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    color: colors.onSurfaceVariant,
   },
   itemContent: {
     flex: 1,
   },
   itemName: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleSm.fontSize,
+    color: colors.onSurface,
   },
   itemHandle: {
-    fontSize: 13,
-    fontWeight: '300',
-    color: '#666',
-    marginTop: 2,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   requestNote: {
-    fontSize: 13,
-    fontWeight: '300',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
     fontStyle: 'italic',
-    color: '#666',
-    marginTop: 4,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   pendingLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#999',
-    marginTop: 4,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   requestActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
   },
   acceptButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
+    backgroundColor: colors.secondary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
   },
   acceptButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSecondary,
   },
   declineButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 4,
+    backgroundColor: colors.surfaceContainerHighest,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
   },
   declineButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   cancelButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 4,
+    backgroundColor: colors.surfaceContainerHighest,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
   },
   cancelButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   removeButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   removeButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#999',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   emptyState: {
-    padding: 48,
+    padding: spacing.xxxl,
     alignItems: 'center',
   },
   emptyIcon: {
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   emptyTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 8,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
   },
   emptySubtitle: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    lineHeight: typography.bodyMd.lineHeight,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.lg,
   },
   emptyButton: {
-    marginTop: 20,
-    backgroundColor: '#000',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    marginTop: spacing.xl,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    borderRadius: radius.xl,
   },
   emptyButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onPrimary,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
   },
 });

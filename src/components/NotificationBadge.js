@@ -4,6 +4,14 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../hooks/useNotifications';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+  touchTarget,
+} from '../constants/theme';
 
 /**
  * Notification bell icon with badge for screen headers.
@@ -20,7 +28,7 @@ export default function NotificationBadge() {
       onPress={() => navigation.navigate('Notifications')}
     >
       <View style={styles.iconContainer}>
-        <Ionicons name="notifications-outline" size={22} color="#000" />
+        <Ionicons name="notifications-outline" size={22} color={colors.onSurface} />
         {unreadCount > 0 && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>
@@ -35,7 +43,7 @@ export default function NotificationBadge() {
 
 const styles = StyleSheet.create({
   button: {
-    minWidth: 44,
+    minWidth: touchTarget.min,
     alignItems: 'flex-end',
   },
   iconContainer: {
@@ -43,19 +51,19 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: '#000',
-    borderRadius: 10,
+    top: -2,
+    right: -4,
+    backgroundColor: colors.secondary,
+    borderRadius: radius.full,
     minWidth: 16,
     height: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 4,
+    paddingHorizontal: spacing.xs,
   },
   badgeText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize - 1,
+    color: colors.onSecondary,
   },
 });

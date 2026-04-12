@@ -14,6 +14,13 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useSavedJournals } from '../hooks/useSavedJournals';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 /**
  * Dedicated Saved screen for viewing saved posts.
@@ -159,7 +166,7 @@ export default function SavedScreen({ navigation }) {
           <View style={styles.placeholder} />
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -205,26 +212,26 @@ export default function SavedScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
   backButton: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     minWidth: 50,
   },
   headerTitle: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   placeholder: {
     minWidth: 50,
@@ -238,110 +245,109 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingBottom: 40,
+    paddingBottom: spacing.xl,
   },
   list: {
-    paddingTop: 8,
+    paddingTop: spacing.sm,
   },
   countText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#999',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   savedItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.surface,
   },
   thumbnail: {
     width: 60,
     height: 60,
-    borderRadius: 4,
-    marginRight: 14,
+    borderRadius: radius.md,
+    marginRight: spacing.md,
   },
   thumbnailPlaceholder: {
     width: 60,
     height: 60,
-    borderRadius: 4,
-    backgroundColor: '#f0f0f0',
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceContainerHigh,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 14,
+    marginRight: spacing.md,
   },
   thumbnailText: {
-    fontSize: 20,
-    fontWeight: '500',
-    color: '#999',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleLg.fontSize,
+    color: colors.onSurfaceVariant,
   },
   itemContent: {
     flex: 1,
   },
   itemHeadline: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 6,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.xs,
     lineHeight: 20,
   },
   authorRow: {
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   authorName: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   metaText: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   metaDot: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#ccc',
-    marginHorizontal: 6,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginHorizontal: spacing.xs,
   },
   kudosText: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   unsaveButton: {
-    padding: 8,
-    marginLeft: 8,
+    padding: spacing.sm,
+    marginLeft: spacing.sm,
   },
   unsaveIcon: {
     fontSize: 24,
-    fontWeight: '300',
-    color: '#ccc',
+    fontFamily: fontFamily.regular,
+    color: colors.onSurfaceVariant,
   },
   emptyState: {
-    padding: 48,
+    padding: spacing.xl,
     alignItems: 'center',
   },
   emptyTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 8,
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
   },
   emptySubtitle: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
     lineHeight: 22,
   },

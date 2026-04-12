@@ -12,6 +12,13 @@ import {
 } from 'react-native';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -61,7 +68,7 @@ export default function LoginScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Email"
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.onSurfaceVariant}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -72,7 +79,7 @@ export default function LoginScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Password"
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.onSurfaceVariant}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -85,7 +92,7 @@ export default function LoginScreen({ navigation }) {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={colors.onPrimary} size="small" />
             ) : (
               <Text style={styles.buttonText}>Sign In</Text>
             )}
@@ -133,80 +140,85 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   inner: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: spacing.xl,
   },
   logo: {
+    fontFamily: fontFamily.regular,
     fontSize: 28,
-    fontWeight: '300',
     letterSpacing: 8,
     textAlign: 'center',
     marginBottom: 80,
-    color: '#000',
+    color: colors.onSurface,
   },
   form: {
-    gap: 16,
+    gap: spacing.md,
   },
   input: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    paddingVertical: 12,
-    fontSize: 14,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
     letterSpacing: 0.5,
-    color: '#000',
+    color: colors.onSurface,
   },
   button: {
-    backgroundColor: '#000',
-    paddingVertical: 16,
-    marginTop: 24,
+    backgroundColor: colors.primary,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
+    marginTop: spacing.lg,
   },
   buttonDisabled: {
-    backgroundColor: '#666',
+    backgroundColor: colors.onSurfaceVariant,
   },
   buttonText: {
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onPrimary,
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 2,
-    fontWeight: '500',
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: spacing.lg,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#ddd',
+    backgroundColor: colors.surfaceContainerHigh,
   },
   dividerText: {
-    paddingHorizontal: 16,
-    fontSize: 12,
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    paddingHorizontal: spacing.md,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1,
   },
   appleButton: {
     width: '100%',
     height: 48,
-    marginTop: 16,
+    marginTop: spacing.md,
   },
   forgotLink: {
-    marginTop: 24,
+    marginTop: spacing.lg,
     alignSelf: 'center',
   },
   link: {
-    marginTop: 16,
+    marginTop: spacing.md,
     alignSelf: 'center',
   },
   linkText: {
-    fontSize: 12,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 1,
-    color: '#666',
+    color: colors.onSurfaceVariant,
     textDecorationLine: 'underline',
   },
 });

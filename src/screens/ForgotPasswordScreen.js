@@ -11,6 +11,13 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 export default function ForgotPasswordScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -71,7 +78,7 @@ export default function ForgotPasswordScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Email"
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.onSurfaceVariant}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -85,7 +92,7 @@ export default function ForgotPasswordScreen({ navigation }) {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={colors.onPrimary} size="small" />
             ) : (
               <Text style={styles.buttonText}>Send Reset Link</Text>
             )}
@@ -107,80 +114,84 @@ export default function ForgotPasswordScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   inner: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: spacing.xl,
   },
   logo: {
+    fontFamily: fontFamily.regular,
     fontSize: 28,
-    fontWeight: '300',
     letterSpacing: 8,
     textAlign: 'center',
-    marginBottom: 40,
-    color: '#000',
+    marginBottom: spacing.xl,
+    color: colors.onSurface,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '300',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.titleLg.fontSize,
     letterSpacing: 2,
     textAlign: 'center',
-    marginBottom: 12,
-    color: '#000',
+    marginBottom: spacing.md,
+    color: colors.onSurface,
   },
   subtitle: {
-    fontSize: 14,
-    fontWeight: '300',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
     letterSpacing: 0.5,
     textAlign: 'center',
-    marginBottom: 40,
-    color: '#666',
+    marginBottom: spacing.xl,
+    color: colors.onSurfaceVariant,
   },
   message: {
-    fontSize: 14,
-    fontWeight: '300',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
     letterSpacing: 0.5,
     textAlign: 'center',
-    marginBottom: 40,
-    color: '#666',
+    marginBottom: spacing.xl,
+    color: colors.onSurfaceVariant,
     lineHeight: 22,
   },
   form: {
-    gap: 16,
+    gap: spacing.md,
   },
   input: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    paddingVertical: 12,
-    fontSize: 14,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
     letterSpacing: 0.5,
-    color: '#000',
+    color: colors.onSurface,
   },
   button: {
-    backgroundColor: '#000',
-    paddingVertical: 16,
-    marginTop: 24,
+    backgroundColor: colors.primary,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
+    marginTop: spacing.lg,
   },
   buttonDisabled: {
-    backgroundColor: '#666',
+    backgroundColor: colors.onSurfaceVariant,
   },
   buttonText: {
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onPrimary,
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 2,
-    fontWeight: '500',
   },
   link: {
-    marginTop: 40,
+    marginTop: spacing.xl,
     alignSelf: 'center',
   },
   linkText: {
-    fontSize: 12,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 1,
-    color: '#666',
+    color: colors.onSurfaceVariant,
     textDecorationLine: 'underline',
   },
 });

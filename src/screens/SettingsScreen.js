@@ -19,6 +19,15 @@ import { useProfile } from '../hooks/useProfile';
 import { useFriends } from '../hooks/useFriends';
 import { useBlocks } from '../hooks/useBlocks';
 import { useUnsavedChanges } from '../contexts/UnsavedChangesContext';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+  editorialMargins,
+  components,
+} from '../constants/theme';
 
 export default function SettingsScreen({ navigation }) {
   const { user, signOut } = useAuth();
@@ -242,7 +251,7 @@ export default function SettingsScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loading}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -282,7 +291,7 @@ export default function SettingsScreen({ navigation }) {
               value={displayName}
               onChangeText={setDisplayName}
               placeholder="Your name"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
             />
           </View>
 
@@ -429,15 +438,15 @@ export default function SettingsScreen({ navigation }) {
             <Switch
               value={locationEnabled}
               onValueChange={handleLocationToggle}
-              trackColor={{ false: '#ddd', true: '#000' }}
-              thumbColor="#fff"
+              trackColor={{ false: colors.surfaceContainerHighest, true: colors.secondary }}
+              thumbColor={colors.white}
               disabled={locationLoading}
             />
           </View>
 
           {locationEnabled && locationLoading && (
             <View style={styles.locationLoading}>
-              <ActivityIndicator size="small" color="#000" />
+              <ActivityIndicator size="small" color={colors.primary} />
               <Text style={styles.locationLoadingText}>Finding your location...</Text>
             </View>
           )}
@@ -455,10 +464,10 @@ export default function SettingsScreen({ navigation }) {
                   </View>
                   <View style={styles.locationActions}>
                     <TouchableOpacity onPress={handleRefreshLocation} style={styles.locationActionButton}>
-                      <Ionicons name="refresh-outline" size={18} color="#666" />
+                      <Ionicons name="refresh-outline" size={18} color={colors.onSurfaceVariant} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={handleSwitchToManual} style={styles.locationActionButton}>
-                      <Ionicons name="pencil-outline" size={18} color="#666" />
+                      <Ionicons name="pencil-outline" size={18} color={colors.onSurfaceVariant} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -472,7 +481,7 @@ export default function SettingsScreen({ navigation }) {
                       value={locationCity}
                       onChangeText={setLocationCity}
                       placeholder="Enter your city"
-                      placeholderTextColor="#999"
+                      placeholderTextColor={colors.onSurfaceVariant}
                     />
                   </View>
 
@@ -483,13 +492,13 @@ export default function SettingsScreen({ navigation }) {
                       value={locationRegion}
                       onChangeText={setLocationRegion}
                       placeholder="Enter your region"
-                      placeholderTextColor="#999"
+                      placeholderTextColor={colors.onSurfaceVariant}
                     />
                   </View>
 
                   {!manualLocationMode && (
                     <TouchableOpacity onPress={handleRefreshLocation} style={styles.detectButton}>
-                      <Ionicons name="location-outline" size={18} color="#000" />
+                      <Ionicons name="location-outline" size={18} color={colors.primary} />
                       <Text style={styles.detectButtonText}>Detect My Location</Text>
                     </TouchableOpacity>
                   )}
@@ -507,7 +516,7 @@ export default function SettingsScreen({ navigation }) {
             disabled={saving}
           >
             {saving ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={colors.onPrimary} size="small" />
             ) : (
               <Text style={styles.saveButtonText}>Save Changes</Text>
             )}
@@ -525,7 +534,7 @@ export default function SettingsScreen({ navigation }) {
             style={styles.devToolsButton}
             onPress={() => navigation.navigate('DevTools')}
           >
-            <Ionicons name="construct-outline" size={16} color="#666" />
+            <Ionicons name="construct-outline" size={16} color={colors.onSurfaceVariant} />
             <Text style={styles.devToolsButtonText}>Developer Tools</Text>
           </TouchableOpacity>
         )}
@@ -541,7 +550,7 @@ export default function SettingsScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   loading: {
     flex: 1,
@@ -552,310 +561,316 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    padding: spacing.xxl,
   },
   errorTitle: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#c00',
-    marginBottom: 8,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.error,
+    marginBottom: spacing.sm,
   },
   errorMessage: {
-    fontSize: 14,
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingLeft: editorialMargins.left,
+    paddingRight: editorialMargins.right,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.surfaceContainerLow,
   },
   backButton: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.primary,
     minWidth: 50,
   },
   placeholder: {
     minWidth: 50,
   },
   title: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    padding: 24,
+    paddingLeft: editorialMargins.left,
+    paddingRight: editorialMargins.right,
+    paddingVertical: spacing.xl,
   },
   section: {
-    marginBottom: 32,
+    marginBottom: spacing.xxl,
   },
   sectionTitle: {
-    fontSize: 10,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 2,
-    color: '#999',
+    color: colors.onSurfaceVariant,
     textTransform: 'uppercase',
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   field: {
-    marginBottom: 20,
+    marginBottom: spacing.xl,
   },
   fieldRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 20,
+    marginBottom: spacing.xl,
   },
   fieldRowText: {
     flex: 1,
-    marginRight: 16,
+    marginRight: spacing.lg,
   },
   label: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
-    marginBottom: 8,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
   },
   value: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   hint: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#999',
-    marginTop: 4,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodySm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   editProfileButton: {
-    borderWidth: 1,
-    borderColor: '#000',
-    paddingVertical: 12,
+    backgroundColor: colors.surfaceContainerHighest,
+    paddingVertical: spacing.md,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: spacing.sm,
+    borderRadius: radius.xl,
   },
   editProfileButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   input: {
+    backgroundColor: colors.surfaceContainerHighest,
+    borderRadius: radius.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    paddingVertical: 8,
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#000',
+    borderBottomColor: `rgba(196, 198, 207, 0.15)`,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
   privacyOptions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
   },
   privacyOption: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingVertical: 12,
+    backgroundColor: colors.surfaceContainer,
+    paddingVertical: spacing.md,
     alignItems: 'center',
+    borderRadius: radius.lg,
   },
   privacyOptionActive: {
-    borderColor: '#000',
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
   },
   privacyOptionText: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#666',
+    color: colors.onSurfaceVariant,
   },
   privacyOptionTextActive: {
-    color: '#fff',
+    color: colors.onPrimary,
   },
   locationLoading: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    gap: 12,
+    paddingVertical: spacing.lg,
+    gap: spacing.md,
   },
   locationLoadingText: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   detectedLocation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 16,
-    marginBottom: 8,
+    backgroundColor: colors.surfaceContainerLow,
+    padding: spacing.lg,
+    marginBottom: spacing.sm,
+    borderRadius: radius.lg,
   },
   detectedLocationInfo: {
     flex: 1,
   },
   detectedCity: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.onSurface,
   },
   detectedRegion: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#666',
-    marginTop: 2,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodySm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   locationActions: {
     flexDirection: 'row',
-    gap: 16,
+    gap: spacing.lg,
   },
   locationActionButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   detectButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingVertical: 12,
-    marginTop: 8,
+    gap: spacing.sm,
+    backgroundColor: colors.surfaceContainerHighest,
+    paddingVertical: spacing.md,
+    marginTop: spacing.sm,
+    borderRadius: radius.xl,
   },
   detectButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   saveButton: {
-    backgroundColor: '#000',
-    paddingVertical: 16,
-    marginBottom: 16,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.lg,
+    marginBottom: spacing.lg,
+    borderRadius: radius.xl,
   },
   saveButtonDisabled: {
-    backgroundColor: '#666',
+    backgroundColor: colors.onSurfaceVariant,
   },
   saveButtonText: {
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onPrimary,
     textAlign: 'center',
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 2,
   },
   logoutButton: {
-    borderWidth: 1,
-    borderColor: '#000',
-    paddingVertical: 16,
-    marginBottom: 32,
+    backgroundColor: colors.surfaceContainerHighest,
+    paddingVertical: spacing.lg,
+    marginBottom: spacing.xxl,
+    borderRadius: radius.xl,
   },
   logoutButtonText: {
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    color: colors.onSurface,
     textAlign: 'center',
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 2,
   },
   footer: {
     alignItems: 'center',
-    paddingVertical: 24,
+    paddingVertical: spacing.xl,
   },
   footerText: {
-    fontSize: 10,
-    fontWeight: '300',
-    color: '#ccc',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.outlineVariant,
     letterSpacing: 1,
   },
   linkRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 16,
+    backgroundColor: colors.surfaceContainerLow,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
   },
   linkRowBorderTop: {
-    borderTopWidth: 0,
+    // Removed - no borders in new design
   },
   linkRowContent: {
     flex: 1,
   },
   linkRowLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleSm.fontSize,
+    color: colors.onSurface,
   },
   linkRowValue: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#666',
-    marginTop: 4,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodySm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   linkRowArrow: {
+    fontFamily: fontFamily.regular,
     fontSize: 20,
-    fontWeight: '300',
-    color: '#999',
-    marginLeft: 12,
+    color: colors.onSurfaceVariant,
+    marginLeft: spacing.md,
   },
   blockedUserRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surfaceContainerLow,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+    borderRadius: radius.lg,
   },
   blockedUserInfo: {
     flex: 1,
   },
   blockedUserName: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleSm.fontSize,
+    color: colors.onSurface,
   },
   blockedUserHandle: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#666',
-    marginTop: 2,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodySm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   unblockButton: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 4,
+    backgroundColor: colors.surfaceContainerHighest,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.xl,
   },
   unblockButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   devToolsButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderStyle: 'dashed',
+    gap: spacing.sm,
+    backgroundColor: colors.surfaceContainerLow,
     paddingVertical: 14,
-    marginBottom: 16,
+    marginBottom: spacing.lg,
+    borderRadius: radius.lg,
   },
   devToolsButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
 });

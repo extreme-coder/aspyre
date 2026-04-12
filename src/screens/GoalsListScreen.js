@@ -13,6 +13,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useGoals } from '../hooks/useGoals';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 const GOAL_TYPE_LABELS = {
   habit: 'Habit',
@@ -44,7 +51,7 @@ function GoalCard({ goal, onPress, onToggleArchive }) {
         <Ionicons
           name={goal.is_archived ? 'arrow-undo-outline' : 'archive-outline'}
           size={18}
-          color="#666"
+          color={colors.onSurfaceVariant}
         />
       </TouchableOpacity>
     </TouchableOpacity>
@@ -97,7 +104,7 @@ export default function GoalsListScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loading}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -110,7 +117,7 @@ export default function GoalsListScreen({ navigation }) {
           <Text style={styles.errorTitle}>Failed to load goals</Text>
           <Text style={styles.errorMessage}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={fetchGoals}>
-            <Ionicons name="refresh-outline" size={18} color="#fff" />
+            <Ionicons name="refresh-outline" size={18} color={colors.onPrimary} />
             <Text style={styles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
         </View>
@@ -175,7 +182,7 @@ export default function GoalsListScreen({ navigation }) {
       {/* Floating Add Button */}
       {!showArchived && (
         <TouchableOpacity style={styles.fab} onPress={handleCreateGoal}>
-          <Ionicons name="add" size={28} color="#fff" />
+          <Ionicons name="add" size={28} color={colors.onPrimary} />
         </TouchableOpacity>
       )}
     </SafeAreaView>
@@ -185,7 +192,7 @@ export default function GoalsListScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   loading: {
     flex: 1,
@@ -196,175 +203,177 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    padding: spacing.xl,
   },
   errorTitle: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#c00',
-    marginBottom: 8,
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.error,
+    marginBottom: spacing.sm,
   },
   errorMessage: {
-    fontSize: 14,
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   retryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#000',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    gap: spacing.sm,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.xl,
   },
   retryButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 2,
-    color: '#fff',
+    color: colors.onPrimary,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
   title: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   addButtonContainer: {
     minWidth: 50,
   },
   addButton: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.primary,
   },
   toggleRow: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    backgroundColor: colors.surfaceContainerLow,
   },
   toggleOption: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: spacing.md,
     alignItems: 'center',
   },
   toggleOptionActive: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#000',
+    backgroundColor: colors.primary,
   },
   toggleText: {
-    fontSize: 12,
-    fontWeight: '400',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#999',
+    color: colors.onSurfaceVariant,
   },
   toggleTextActive: {
-    color: '#000',
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    color: colors.onPrimary,
   },
   list: {
-    padding: 24,
+    padding: spacing.lg,
   },
   goalCard: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 20,
-    marginBottom: 16,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
   goalCardContent: {
     flex: 1,
-    marginRight: 16,
+    marginRight: spacing.lg,
   },
   goalTitle: {
-    fontSize: 16,
-    fontWeight: '400',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyLg.fontSize,
     letterSpacing: 0.5,
-    color: '#000',
-    marginBottom: 6,
+    color: colors.onSurface,
+    marginBottom: spacing.xs,
   },
   goalType: {
-    fontSize: 10,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 2,
-    color: '#999',
+    color: colors.onSurfaceVariant,
     textTransform: 'uppercase',
   },
   tagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: 10,
-    gap: 6,
+    marginTop: spacing.sm,
+    gap: spacing.xs,
   },
   tag: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: colors.secondaryContainer,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.full,
   },
   tagText: {
-    fontSize: 10,
-    fontWeight: '400',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 0.5,
-    color: '#666',
+    color: colors.onSecondaryContainer,
   },
   archiveButton: {
-    padding: 8,
+    padding: spacing.sm,
   },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    padding: spacing.xl,
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: '300',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
-    marginBottom: 8,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
   },
   emptySubtitle: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   createButton: {
-    backgroundColor: '#000',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    borderRadius: radius.xl,
   },
   createButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    color: colors.onPrimary,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 2,
   },
   fab: {
     position: 'absolute',
-    bottom: 24,
-    right: 24,
+    bottom: spacing.lg,
+    right: spacing.lg,
     width: 56,
     height: 56,
-    borderRadius: 28,
-    backgroundColor: '#000',
+    borderRadius: radius.full,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowRadius: 8,
     elevation: 5,
   },
 });

@@ -2,6 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNetworkState } from '../hooks/useNetworkState';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 /**
  * Banner that shows when the device is offline.
@@ -22,7 +29,7 @@ export default function OfflineBanner({ onRetry }) {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Ionicons name="cloud-offline-outline" size={16} color="#856404" />
+        <Ionicons name="cloud-offline-outline" size={16} color={colors.onTertiaryContainer} />
         <Text style={styles.text}>You're offline</Text>
       </View>
       <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
@@ -37,31 +44,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fff3cd',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ffc107',
+    backgroundColor: colors.tertiaryContainer,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    // NO border - tonal contrast is sufficient
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   text: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#856404',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onTertiaryContainer,
   },
   retryButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: '#856404',
-    borderRadius: 4,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.tertiary,
+    borderRadius: radius.full,
   },
   retryText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onTertiary,
   },
 });

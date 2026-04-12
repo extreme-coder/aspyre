@@ -13,6 +13,13 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../config/supabase';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 const REPORT_REASONS = [
   { value: 'spam', label: 'Spam or misleading' },
@@ -92,7 +99,7 @@ export default function ReportModal({
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <Ionicons name="close" size={24} color="#666" />
+            <Ionicons name="close" size={24} color={colors.onSurfaceVariant} />
           </TouchableOpacity>
           <Text style={styles.title}>Report Post</Text>
           <TouchableOpacity
@@ -146,7 +153,7 @@ export default function ReportModal({
               value={details}
               onChangeText={setDetails}
               placeholder="Tell us more about the issue..."
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
               multiline
               numberOfLines={4}
               textAlignVertical="top"
@@ -165,118 +172,116 @@ export default function ReportModal({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.surfaceContainerLow,
   },
   closeButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   closeButtonText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurface,
     letterSpacing: 0.5,
   },
   submitButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   submitButtonDisabled: {
     opacity: 0.5,
   },
   submitButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#000',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.primary,
   },
   submitButtonTextDisabled: {
-    color: '#999',
+    color: colors.onSurfaceVariant,
   },
   content: {
     flex: 1,
-    padding: 24,
+    padding: spacing.xl,
   },
   subtitle: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#333',
-    marginBottom: 20,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.lg,
   },
   reasons: {
-    gap: 12,
+    gap: spacing.md,
   },
   reasonOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: '#eee',
-    gap: 12,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: radius.lg,
+    gap: spacing.md,
   },
   reasonOptionSelected: {
-    borderColor: '#000',
-    backgroundColor: '#fafafa',
+    backgroundColor: colors.secondaryContainer,
   },
   radioOuter: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#ccc',
+    borderColor: colors.outlineVariant,
     justifyContent: 'center',
     alignItems: 'center',
   },
   radioOuterSelected: {
-    borderColor: '#000',
+    borderColor: colors.primary,
   },
   radioInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
   },
   reasonLabel: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#333',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
   detailsSection: {
-    marginTop: 24,
+    marginTop: spacing.xl,
   },
   detailsLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 0.5,
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   detailsInput: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 12,
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#333',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     minHeight: 100,
   },
   disclaimer: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#999',
-    marginTop: 24,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xl,
     lineHeight: 18,
     textAlign: 'center',
   },

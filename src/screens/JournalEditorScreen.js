@@ -19,6 +19,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { useJournalEditor } from '../hooks/useJournalEditor';
 import { useGoals } from '../hooks/useGoals';
 import { formatDateForDisplay } from '../utils/dateUtils';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 const PRIVACY_OPTIONS = [
   { value: 'everyone', label: 'Everyone' },
@@ -338,7 +345,7 @@ export default function JournalEditorScreen({ navigation, route }) {
           <View style={styles.placeholder} />
         </View>
         <View style={styles.loading}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -352,7 +359,7 @@ export default function JournalEditorScreen({ navigation, route }) {
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-            <Ionicons name="close" size={24} color="#666" />
+            <Ionicons name="close" size={24} color={colors.onSurfaceVariant} />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
             <Text style={styles.title}>Edit Post</Text>
@@ -362,7 +369,7 @@ export default function JournalEditorScreen({ navigation, route }) {
           </View>
           <TouchableOpacity onPress={handleSave} disabled={saving || uploadingImage}>
             {saving || uploadingImage ? (
-              <ActivityIndicator size="small" color="#000" />
+              <ActivityIndicator size="small" color={colors.primary} />
             ) : (
               <Text style={styles.saveButton}>Save</Text>
             )}
@@ -380,7 +387,7 @@ export default function JournalEditorScreen({ navigation, route }) {
               <Image source={{ uri: mediaUri }} style={styles.heroImage} />
             ) : (
               <View style={styles.imagePlaceholder}>
-                <Ionicons name="camera-outline" size={28} color="#999" />
+                <Ionicons name="camera-outline" size={28} color={colors.onSurfaceVariant} />
               </View>
             )}
           </TouchableOpacity>
@@ -393,7 +400,7 @@ export default function JournalEditorScreen({ navigation, route }) {
               value={headline}
               onChangeText={setHeadline}
               placeholder="What did you accomplish?"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
               maxLength={100}
             />
           </View>
@@ -458,7 +465,7 @@ export default function JournalEditorScreen({ navigation, route }) {
                   value={chip.value}
                   onChangeText={(text) => updateProofChip(index, 'value', text)}
                   placeholder={PROOF_CHIP_TYPES.find(t => t.type === chip.type)?.placeholder || ''}
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.onSurfaceVariant}
                   keyboardType={chip.type === 'custom' ? 'default' : 'numeric'}
                 />
                 <TouchableOpacity
@@ -499,7 +506,7 @@ export default function JournalEditorScreen({ navigation, route }) {
                   value={bullet.text}
                   onChangeText={(text) => updateBullet(bullet.id, text)}
                   placeholder="What happened?"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.onSurfaceVariant}
                   multiline
                 />
                 {bullets.length > 1 && (
@@ -524,7 +531,7 @@ export default function JournalEditorScreen({ navigation, route }) {
               value={friction}
               onChangeText={setFriction}
               placeholder="What was hard?"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
               multiline
             />
           </View>
@@ -536,7 +543,7 @@ export default function JournalEditorScreen({ navigation, route }) {
               value={fix}
               onChangeText={setFix}
               placeholder="What went well?"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
               multiline
             />
           </View>
@@ -548,7 +555,7 @@ export default function JournalEditorScreen({ navigation, route }) {
               value={takeaway}
               onChangeText={setTakeaway}
               placeholder="What did you learn?"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
               multiline
             />
           </View>
@@ -560,7 +567,7 @@ export default function JournalEditorScreen({ navigation, route }) {
               value={nextStep}
               onChangeText={setNextStep}
               placeholder="What's next?"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
               multiline
             />
           </View>
@@ -647,7 +654,7 @@ export default function JournalEditorScreen({ navigation, route }) {
                 value={feedbackQuestion}
                 onChangeText={setFeedbackQuestion}
                 placeholder="What would you like feedback on?"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.onSurfaceVariant}
                 multiline
               />
             )}
@@ -663,7 +670,7 @@ export default function JournalEditorScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   keyboardView: {
     flex: 1,
@@ -672,34 +679,38 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  headerButton: {
+    width: 40,
+    alignItems: 'center',
   },
   headerCenter: {
     alignItems: 'center',
   },
   cancelButton: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
     minWidth: 50,
   },
   title: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   dateText: {
-    fontSize: 11,
-    fontWeight: '300',
-    color: '#999',
-    marginTop: 2,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   saveButton: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.primary,
     minWidth: 50,
     textAlign: 'right',
   },
@@ -715,162 +726,159 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 24,
+    padding: spacing.lg,
   },
   imageSection: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   heroImage: {
     width: '100%',
     aspectRatio: 4 / 3,
-    borderRadius: 8,
+    borderRadius: radius.lg,
   },
   imagePlaceholder: {
     width: '100%',
     aspectRatio: 4 / 3,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderStyle: 'dashed',
   },
   imagePlaceholderText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   label: {
-    fontSize: 10,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 2,
-    color: '#999',
+    color: colors.onSurfaceVariant,
     textTransform: 'uppercase',
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
   headlineInput: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    paddingVertical: 10,
-    fontSize: 18,
-    fontWeight: '400',
-    color: '#000',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.onSurface,
   },
   picker: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 14,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    padding: spacing.md,
   },
   pickerValue: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#000',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
   pickerPlaceholder: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   pickerOptions: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderTopWidth: 0,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    marginTop: spacing.xs,
+    overflow: 'hidden',
   },
   pickerOption: {
-    padding: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    padding: spacing.md,
   },
   pickerOptionActive: {
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
   },
   pickerOptionText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#000',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
   pickerOptionTextActive: {
-    color: '#fff',
+    color: colors.onPrimary,
   },
   chipRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
-    gap: 10,
+    marginBottom: spacing.sm,
+    gap: spacing.sm,
   },
   chipValueInput: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 12,
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#000',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
   },
   chipTypeButton: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 12,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    padding: spacing.md,
     minWidth: 80,
     alignItems: 'center',
   },
   chipTypeText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   bulletRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
   bulletDot: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#999',
-    marginRight: 10,
-    marginTop: 12,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurfaceVariant,
+    marginRight: spacing.sm,
+    marginTop: spacing.md,
   },
   bulletInput: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 12,
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#000',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     minHeight: 44,
   },
   textArea: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 14,
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#000',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     minHeight: 80,
     textAlignVertical: 'top',
   },
   addButton: {
-    padding: 12,
+    padding: spacing.md,
   },
   addButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.primary,
     letterSpacing: 1,
   },
   removeButton: {
+    fontFamily: fontFamily.regular,
     fontSize: 24,
-    fontWeight: '300',
-    color: '#ccc',
-    paddingHorizontal: 10,
+    color: colors.onSurfaceVariant,
+    paddingHorizontal: spacing.sm,
   },
   bottomSpacer: {
-    height: 40,
+    height: spacing.xl,
   },
 });

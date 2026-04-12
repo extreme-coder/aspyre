@@ -9,6 +9,14 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../config/supabase';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+  components,
+} from '../constants/theme';
 
 const GOAL_TYPE_LABELS = {
   habit: 'Habit',
@@ -324,7 +332,7 @@ export default function FeedCard({
                   <Text style={[styles.addFriendButtonText, styles.addFriendButtonTextSent]}>Sent</Text>
                 ) : (
                   <>
-                    <Ionicons name="person-add-outline" size={12} color="#fff" />
+                    <Ionicons name="person-add-outline" size={12} color={colors.onPrimary} />
                     <Text style={styles.addFriendButtonText}>Add</Text>
                   </>
                 )}
@@ -336,7 +344,7 @@ export default function FeedCard({
               onPress={handleMoreOptions}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Ionicons name="ellipsis-horizontal" size={18} color="#999" />
+              <Ionicons name="ellipsis-horizontal" size={18} color={colors.onSurfaceVariant} />
             </TouchableOpacity>
           </View>
         </View>
@@ -386,7 +394,7 @@ export default function FeedCard({
             <Ionicons
               name={viewer_has_kudos ? 'heart' : 'heart-outline'}
               size={20}
-              color={viewer_has_kudos ? '#000' : '#666'}
+              color={viewer_has_kudos ? colors.secondary : colors.onSurfaceVariant}
             />
             {parseInt(kudos_count) > 0 && (
               <Text
@@ -408,7 +416,7 @@ export default function FeedCard({
             <Ionicons
               name={viewer_has_saved ? 'bookmark' : 'bookmark-outline'}
               size={20}
-              color={viewer_has_saved ? '#000' : '#666'}
+              color={viewer_has_saved ? colors.tertiary : colors.onSurfaceVariant}
             />
           </TouchableOpacity>
         </View>
@@ -419,31 +427,33 @@ export default function FeedCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#eee',
-    marginBottom: 16,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: radius.lg,
+    marginBottom: spacing.md,
     overflow: 'hidden',
+    // NO border - use tonal layering instead
   },
   heroImage: {
     width: '100%',
     aspectRatio: 4 / 3,
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
   },
   contentContainer: {
-    padding: 16,
+    padding: spacing.lg,
   },
   headline: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 12,
-    lineHeight: 24,
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleLg.fontSize,
+    lineHeight: typography.titleLg.lineHeight,
+    color: colors.onSurface,
+    marginBottom: spacing.md,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   authorInfo: {
     flexDirection: 'row',
@@ -453,140 +463,139 @@ const styles = StyleSheet.create({
   avatar: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    marginRight: 10,
+    borderRadius: radius.full,
+    marginRight: spacing.md,
   },
   avatarPlaceholder: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: '#f0f0f0',
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceContainerHigh,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: spacing.md,
   },
   avatarText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   authorText: {
     flex: 1,
   },
   authorName: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleSm.fontSize,
+    color: colors.onSurface,
     letterSpacing: 0.3,
   },
   goalInfo: {
-    fontSize: 11,
-    fontWeight: '300',
-    color: '#666',
-    marginTop: 2,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   location: {
-    fontSize: 11,
-    fontWeight: '300',
-    color: '#999',
-    marginTop: 2,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.md,
   },
   timestamp: {
-    fontSize: 11,
-    fontWeight: '300',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   moreButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   chipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 12,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   chip: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 4,
+    backgroundColor: colors.secondaryContainer,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
   },
   chipText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#333',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSecondaryContainer,
   },
   readMoreButton: {
-    paddingVertical: 8,
-    marginBottom: 4,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.xs,
   },
   readMoreText: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.primary,
   },
   legacyContent: {
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   section: {
-    gap: 4,
+    gap: spacing.xs,
   },
   sectionLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#999',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
   sectionText: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#333',
-    lineHeight: 20,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    lineHeight: typography.bodyMd.lineHeight,
+    color: colors.onSurface,
   },
   actions: {
     flexDirection: 'row',
-    gap: 24,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    gap: spacing.xl,
+    paddingTop: spacing.md,
+    // NO border - use spacing instead
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: spacing.sm,
   },
   actionCount: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   actionCountActive: {
-    color: '#000',
+    color: colors.secondary,
   },
   addFriendButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#000',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 4,
+    gap: spacing.xs,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
   },
   addFriendButtonSent: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: colors.surfaceContainerHighest,
   },
   addFriendButtonText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onPrimary,
   },
   addFriendButtonTextSent: {
-    color: '#666',
+    color: colors.onSurfaceVariant,
   },
 });

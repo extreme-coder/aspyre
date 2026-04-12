@@ -15,6 +15,13 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useGoals } from '../hooks/useGoals';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 const GOAL_TYPES = [
   { value: 'habit', label: 'Habit', description: 'Build a daily/weekly routine' },
@@ -149,12 +156,12 @@ export default function GoalEditorScreen({ navigation, route }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Ionicons name="close" size={24} color="#666" />
+          <Ionicons name="close" size={24} color={colors.onSurfaceVariant} />
         </TouchableOpacity>
         <Text style={styles.title}>{isEditing ? 'Edit Goal' : 'New Goal'}</Text>
         <TouchableOpacity onPress={handleSave} disabled={saving} style={styles.headerButton}>
           {saving ? (
-            <ActivityIndicator size="small" color="#000" />
+            <ActivityIndicator size="small" color={colors.primary} />
           ) : (
             <Text style={styles.saveButton}>Save</Text>
           )}
@@ -178,7 +185,7 @@ export default function GoalEditorScreen({ navigation, route }) {
               value={title}
               onChangeText={setTitle}
               placeholder="What do you want to achieve?"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
               autoFocus={!isEditing}
             />
           </View>
@@ -225,7 +232,7 @@ export default function GoalEditorScreen({ navigation, route }) {
               value={tagsInput}
               onChangeText={(text) => setTagsInput(text.toLowerCase().replace(/[^a-z, ]/g, ''))}
               placeholder="fitness, morning, focus (comma separated)"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
             />
             <Text style={styles.hint}>
               Tags help find posts from users with similar interests.
@@ -235,7 +242,7 @@ export default function GoalEditorScreen({ navigation, route }) {
           {/* Delete Button (only when editing) */}
           {isEditing && (
             <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-              <Ionicons name="trash-outline" size={18} color="#c00" />
+              <Ionicons name="trash-outline" size={18} color={colors.error} />
               <Text style={styles.deleteButtonText}>Delete Goal</Text>
             </TouchableOpacity>
           )}
@@ -250,7 +257,7 @@ export default function GoalEditorScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   keyboardView: {
     flex: 1,
@@ -259,102 +266,103 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
   headerButton: {
     width: 40,
     alignItems: 'center',
   },
   title: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   saveButton: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.primary,
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    padding: 24,
+    padding: spacing.lg,
   },
   field: {
-    marginBottom: 32,
+    marginBottom: spacing.xl,
   },
   label: {
-    fontSize: 10,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 2,
-    color: '#999',
+    color: colors.onSurfaceVariant,
     textTransform: 'uppercase',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   input: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    paddingVertical: 12,
-    fontSize: 16,
-    fontWeight: '300',
-    color: '#000',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurface,
   },
   hint: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#999',
-    marginTop: 8,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.sm,
   },
   typeGrid: {
-    gap: 12,
+    gap: spacing.md,
   },
   typeOption: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 16,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
   },
   typeOptionActive: {
-    borderColor: '#000',
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
   },
   typeLabel: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
-    marginBottom: 4,
+    color: colors.onSurface,
+    marginBottom: spacing.xs,
   },
   typeLabelActive: {
-    color: '#fff',
+    color: colors.onPrimary,
   },
   typeDescription: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   typeDescriptionActive: {
-    color: '#999',
+    color: colors.onPrimary,
+    opacity: 0.8,
   },
   deleteButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#c00',
-    paddingVertical: 16,
-    marginTop: 24,
+    gap: spacing.sm,
+    backgroundColor: colors.errorContainer,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.lg,
+    marginTop: spacing.lg,
   },
   deleteButtonText: {
-    color: '#c00',
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    color: colors.error,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 2,
   },
   bottomSpacer: {
-    height: 40,
+    height: spacing.xl,
   },
 });

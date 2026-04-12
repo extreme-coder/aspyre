@@ -3,6 +3,12 @@ import { TouchableOpacity, Image, View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../hooks/useProfile';
+import {
+  colors,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 /**
  * Profile button for screen headers.
@@ -42,19 +48,19 @@ const styles = StyleSheet.create({
   avatar: {
     width: 28,
     height: 28,
-    borderRadius: 14,
+    borderRadius: radius.full,
   },
   avatarPlaceholder: {
     width: 28,
     height: 28,
-    borderRadius: 14,
-    backgroundColor: '#f0f0f0',
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarInitial: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
 });

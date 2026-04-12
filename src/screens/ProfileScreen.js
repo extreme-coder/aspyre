@@ -24,6 +24,14 @@ import { useGoals } from '../hooks/useGoals';
 import { useFriends } from '../hooks/useFriends';
 import { useBlocks } from '../hooks/useBlocks';
 import { supabase } from '../config/supabase';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+  editorialMargins,
+} from '../constants/theme';
 
 const TABS = ['Journals', 'Goals', 'Saved'];
 const OTHER_USER_TABS = ['Journals', 'Goals'];
@@ -392,7 +400,7 @@ export default function ProfileScreen({ route, navigation }) {
     if (actionLoading) {
       return (
         <View style={styles.singleActionButton}>
-          <ActivityIndicator size="small" color="#000" />
+          <ActivityIndicator size="small" color={colors.primary} />
         </View>
       );
     }
@@ -557,7 +565,7 @@ export default function ProfileScreen({ route, navigation }) {
               <Ionicons
                 name={getTabIcon(tab, isActive)}
                 size={22}
-                color={isActive ? '#000' : '#999'}
+                color={isActive ? colors.onSurface : colors.onSurfaceVariant}
               />
             </TouchableOpacity>
           );
@@ -628,7 +636,7 @@ export default function ProfileScreen({ route, navigation }) {
       if (journalsLoading && groupedJournals.length === 0) {
         return (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#000" />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         );
       }
@@ -660,7 +668,7 @@ export default function ProfileScreen({ route, navigation }) {
           ))}
           {loadingMore && (
             <View style={styles.loadingMore}>
-              <ActivityIndicator size="small" color="#000" />
+              <ActivityIndicator size="small" color={colors.primary} />
             </View>
           )}
           {hasMore && !loadingMore && (
@@ -675,7 +683,7 @@ export default function ProfileScreen({ route, navigation }) {
       if (otherJournalsLoading) {
         return (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#000" />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         );
       }
@@ -729,7 +737,7 @@ export default function ProfileScreen({ route, navigation }) {
       if (goalsLoading && activeGoals.length === 0) {
         return (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#000" />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         );
       }
@@ -767,7 +775,7 @@ export default function ProfileScreen({ route, navigation }) {
       if (otherGoalsLoading) {
         return (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#000" />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         );
       }
@@ -798,9 +806,9 @@ export default function ProfileScreen({ route, navigation }) {
           style={styles.viewSavedButton}
           onPress={() => navigation.navigate('Saved')}
         >
-          <Ionicons name="bookmark-outline" size={24} color="#000" />
+          <Ionicons name="bookmark-outline" size={24} color={colors.primary} />
           <Text style={styles.viewSavedText}>View Saved Posts</Text>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
+          <Ionicons name="chevron-forward" size={20} color={colors.onSurfaceVariant} />
         </TouchableOpacity>
         <Text style={styles.savedHint}>
           Posts you save from the feed will appear here
@@ -839,7 +847,7 @@ export default function ProfileScreen({ route, navigation }) {
           </View>
         )}
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -849,7 +857,7 @@ export default function ProfileScreen({ route, navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <TouchableOpacity style={styles.backIconButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
         <View style={styles.errorState}>
           <Text style={styles.errorTitle}>{profileError || 'Profile not found'}</Text>
@@ -873,17 +881,17 @@ export default function ProfileScreen({ route, navigation }) {
               style={styles.settingsButton}
               onPress={() => navigation.navigate('Settings')}
             >
-              <Ionicons name="settings-outline" size={22} color="#000" />
+              <Ionicons name="settings-outline" size={22} color={colors.primary} />
             </TouchableOpacity>
           </View>
         </View>
       ) : (
         <>
           <TouchableOpacity style={styles.backIconButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="#000" />
+            <Ionicons name="arrow-back" size={24} color={colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuIconButton} onPress={() => setShowOptionsMenu(true)}>
-            <Ionicons name="ellipsis-horizontal" size={24} color="#000" />
+            <Ionicons name="ellipsis-horizontal" size={24} color={colors.primary} />
           </TouchableOpacity>
         </>
       )}
@@ -919,7 +927,7 @@ export default function ProfileScreen({ route, navigation }) {
                 value={requestNote}
                 onChangeText={setRequestNote}
                 placeholder="Hey, I'd like to connect!"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.onSurfaceVariant}
                 multiline
                 maxLength={200}
               />
@@ -967,7 +975,7 @@ export default function ProfileScreen({ route, navigation }) {
                   handleBlock();
                 }}
               >
-                <Ionicons name="ban-outline" size={20} color="#c00" />
+                <Ionicons name="ban-outline" size={20} color={colors.error} />
                 <Text style={styles.optionTextDanger}>Block User</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -987,45 +995,45 @@ export default function ProfileScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   ownProfileHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   headerLeft: {
     width: 70,
   },
   ownProfileHeaderTitle: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 2,
-    color: '#000',
+    color: colors.onSurface,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   settingsButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   backIconButton: {
     position: 'absolute',
     top: 50,
-    left: 20,
+    left: spacing.lg,
     zIndex: 10,
-    padding: 8,
+    padding: spacing.sm,
   },
   menuIconButton: {
     position: 'absolute',
     top: 50,
-    right: 20,
+    right: spacing.lg,
     zIndex: 10,
-    padding: 8,
+    padding: spacing.sm,
   },
   optionsOverlay: {
     flex: 1,
@@ -1033,41 +1041,40 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   optionsMenu: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingTop: 8,
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    paddingTop: spacing.sm,
     paddingBottom: 34,
   },
   optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    gap: 12,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.md,
   },
   optionTextDanger: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#c00',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.error,
   },
   optionItemCancel: {
     alignItems: 'center',
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    marginTop: 8,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surfaceContainerLow,
+    marginTop: spacing.sm,
   },
   optionTextCancel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurfaceVariant,
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    paddingBottom: 40,
+    paddingBottom: spacing.xl,
   },
   loadingContainer: {
     flex: 1,
@@ -1079,30 +1086,30 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 48,
+    padding: spacing.xxxl,
   },
   errorTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 8,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
   errorSubtitle: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
   },
 
   // Profile Header
   profileHeader: {
     alignItems: 'center',
-    paddingVertical: 32,
-    paddingHorizontal: 24,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
   },
   avatarContainer: {
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   avatar: {
     width: 80,
@@ -1113,80 +1120,80 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#000',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarText: {
+    fontFamily: fontFamily.regular,
     fontSize: 32,
-    fontWeight: '300',
-    color: '#fff',
+    color: colors.onPrimary,
   },
   displayName: {
-    fontSize: 20,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 4,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.titleLg.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.xs,
   },
   handle: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
-    marginBottom: 12,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.md,
   },
   badgeRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 20,
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
   badge: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
+    backgroundColor: colors.surfaceContainerLow,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.full,
   },
   badgeText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   statItem: {
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.lg,
   },
   statValue: {
+    fontFamily: fontFamily.semiBold,
     fontSize: 24,
-    fontWeight: '600',
-    color: '#000',
+    color: colors.onSurface,
   },
   statLabel: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#999',
-    marginTop: 4,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   statDivider: {
     width: 1,
     height: 30,
-    backgroundColor: '#eee',
+    backgroundColor: colors.surfaceContainerHigh,
   },
   editProfileButton: {
     width: '100%',
-    borderWidth: 1,
-    borderColor: '#000',
-    paddingVertical: 12,
+    backgroundColor: colors.surfaceContainerHighest,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   editProfileText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurface,
     letterSpacing: 1,
   },
 
@@ -1197,169 +1204,171 @@ const styles = StyleSheet.create({
   friendActionButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: spacing.sm,
   },
   singleActionButton: {
     width: '100%',
-    borderWidth: 1,
-    borderColor: '#000',
-    paddingVertical: 10,
+    backgroundColor: colors.primary,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   friendActionButton: {
-    width: '48%',
-    borderWidth: 1,
-    borderColor: '#000',
-    paddingVertical: 10,
+    flex: 1,
+    backgroundColor: colors.secondary,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   friendActionButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onPrimary,
     letterSpacing: 1,
   },
   pendingButton: {
     width: '100%',
-    borderWidth: 1,
-    borderColor: '#000',
-    paddingVertical: 10,
+    backgroundColor: colors.surfaceContainerHighest,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   pendingButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1,
   },
   friendBadge: {
-    width: '48%',
-    borderWidth: 1,
-    borderColor: '#000',
-    paddingVertical: 10,
+    flex: 1,
+    backgroundColor: colors.secondaryContainer,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   friendBadgeText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSecondaryContainer,
     letterSpacing: 1,
   },
   removeButton: {
-    width: '48%',
-    borderWidth: 1,
-    borderColor: '#000',
-    paddingVertical: 10,
+    flex: 1,
+    backgroundColor: colors.surfaceContainerHighest,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   removeButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1,
   },
   declineButton: {
-    width: '48%',
-    borderWidth: 1,
-    borderColor: '#000',
-    paddingVertical: 10,
+    flex: 1,
+    backgroundColor: colors.surfaceContainerHighest,
+    borderRadius: radius.xl,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   declineButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1,
   },
   noteSection: {
-    backgroundColor: '#f9f9f9',
-    padding: 16,
-    borderRadius: 8,
-    marginTop: 20,
+    backgroundColor: colors.surfaceContainerLow,
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    marginTop: spacing.lg,
     width: '100%',
   },
   noteLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#999',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     textTransform: 'uppercase',
     letterSpacing: 1,
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   noteText: {
-    fontSize: 14,
-    fontWeight: '300',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
     fontStyle: 'italic',
-    color: '#333',
+    color: colors.onSurface,
   },
   infoSection: {
-    backgroundColor: '#fff9c4',
-    padding: 16,
-    borderRadius: 8,
-    marginTop: 20,
+    backgroundColor: colors.tertiaryContainer,
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    marginTop: spacing.lg,
     width: '100%',
   },
   infoText: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onTertiaryContainer,
     textAlign: 'center',
   },
 
   // Tabs
   tabs: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    backgroundColor: colors.surfaceContainerLow,
   },
   tab: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: spacing.md,
     alignItems: 'center',
   },
   tabActive: {
     borderBottomWidth: 2,
-    borderBottomColor: '#000',
+    borderBottomColor: colors.primary,
   },
   tabText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#999',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 0.5,
   },
   tabTextActive: {
-    color: '#000',
+    color: colors.primary,
   },
 
   // Journals Tab
   journalsList: {
-    paddingTop: 16,
+    paddingTop: spacing.md,
   },
   journalGroup: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   groupHeader: {
-    fontSize: 10,
-    fontWeight: '600',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 2,
-    color: '#999',
+    color: colors.onSurfaceVariant,
     textTransform: 'uppercase',
-    paddingHorizontal: 24,
-    marginBottom: 12,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md,
   },
   journalItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: radius.lg,
   },
   journalItemLeft: {
     flexDirection: 'row',
@@ -1369,162 +1378,164 @@ const styles = StyleSheet.create({
   journalThumb: {
     width: 50,
     height: 50,
-    borderRadius: 4,
-    marginRight: 12,
+    borderRadius: radius.md,
+    marginRight: spacing.md,
   },
   journalInfo: {
     flex: 1,
   },
   journalHeadline: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 4,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.xs,
   },
   journalDate: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   journalGoal: {
-    fontSize: 11,
-    fontWeight: '300',
-    color: '#666',
-    marginTop: 2,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   journalItemRight: {
     alignItems: 'flex-end',
-    marginLeft: 12,
+    marginLeft: spacing.md,
   },
   kudosCount: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#666',
-    marginBottom: 8,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.sm,
   },
   deleteButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   deleteButtonText: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#c00',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.error,
   },
   loadingMore: {
-    paddingVertical: 20,
+    paddingVertical: spacing.lg,
     alignItems: 'center',
   },
   loadMoreButton: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: spacing.md,
   },
   loadMoreText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.primary,
   },
 
   // Goals Tab
   goalsList: {
-    paddingTop: 16,
+    paddingTop: spacing.md,
   },
   goalItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: radius.lg,
   },
   goalInfo: {
     flex: 1,
   },
   goalTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 4,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.xs,
   },
   goalType: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     textTransform: 'capitalize',
   },
   goalArrow: {
+    fontFamily: fontFamily.regular,
     fontSize: 16,
-    fontWeight: '300',
-    color: '#ccc',
+    color: colors.outlineVariant,
   },
   viewAllGoalsButton: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: spacing.lg,
   },
   viewAllGoalsText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.primary,
     textDecorationLine: 'underline',
   },
 
   // Saved Tab
   savedTabContainer: {
-    padding: 24,
+    padding: spacing.lg,
     alignItems: 'center',
   },
   viewSavedButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 16,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.md,
     width: '100%',
-    gap: 12,
+    gap: spacing.md,
   },
   viewSavedText: {
     flex: 1,
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurface,
   },
   savedHint: {
-    fontSize: 13,
-    fontWeight: '300',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
-    marginTop: 16,
+    marginTop: spacing.md,
   },
 
   // Empty States
   emptyState: {
-    padding: 48,
+    padding: spacing.xxxl,
     alignItems: 'center',
   },
   emptyTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 8,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.sm,
   },
   emptySubtitle: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   ctaButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    backgroundColor: colors.primary,
+    borderRadius: radius.xl,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   ctaButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onPrimary,
     letterSpacing: 1,
   },
 
@@ -1534,69 +1545,68 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: spacing.xl,
   },
   modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.xl,
     width: '100%',
     maxWidth: 340,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 4,
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.onSurface,
+    marginBottom: spacing.xs,
   },
   modalSubtitle: {
-    fontSize: 13,
-    fontWeight: '300',
-    color: '#666',
-    marginBottom: 16,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.lg,
   },
   noteInput: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#000',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     minHeight: 80,
     textAlignVertical: 'top',
   },
   charCount: {
-    fontSize: 10,
-    fontWeight: '300',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     textAlign: 'right',
-    marginTop: 4,
-    marginBottom: 16,
+    marginTop: spacing.xs,
+    marginBottom: spacing.lg,
   },
   modalActions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 12,
+    gap: spacing.md,
   },
   modalCancelButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
   },
   modalCancelText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   modalSendButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 4,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.lg,
   },
   modalSendText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#fff',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onPrimary,
   },
 });

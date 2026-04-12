@@ -2,7 +2,8 @@ import React from 'react';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, Image, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, ActivityIndicator, StyleSheet, Alert, Platform } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 
 // Navigation ref for use outside of React components (e.g., notification handlers)
@@ -11,6 +12,14 @@ export const navigationRef = createNavigationContainerRef();
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../hooks/useProfile';
 import { UnsavedChangesProvider, useUnsavedChanges } from '../contexts/UnsavedChangesContext';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+  glass,
+} from '../constants/theme';
 
 // Auth screens (legacy - for returning users who want to login directly)
 import LoginScreen from '../screens/LoginScreen';
@@ -51,7 +60,7 @@ function AuthStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: '#fff' },
+        contentStyle: { backgroundColor: colors.surface },
         animation: 'fade',
       }}
     >
@@ -138,8 +147,8 @@ function MainTabs() {
         headerShown: false,
         tabBarStyle: styles.tabBar,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: '#000',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.onSurfaceVariant,
       }}
     >
       <Tab.Screen
@@ -188,7 +197,7 @@ function AppStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: '#fff' },
+        contentStyle: { backgroundColor: colors.surface },
       }}
     >
       <Stack.Screen name="MainTabs" component={MainTabs} />
@@ -269,7 +278,7 @@ export default function AppNavigator({ onReady }) {
   if (loading || (user && profile === null)) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#000" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -301,12 +310,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   tabBar: {
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
+    backgroundColor: colors.surfaceContainerLow,
+    borderTopWidth: 0, // No borders - use tonal surface
     height: 85,
     paddingTop: 10,
     paddingBottom: 25,
@@ -314,12 +322,12 @@ const styles = StyleSheet.create({
   avatarContainer: {
     width: 28,
     height: 28,
-    borderRadius: 14,
+    borderRadius: radius.full,
     overflow: 'hidden',
   },
   avatarContainerFocused: {
     borderWidth: 2,
-    borderColor: '#000',
+    borderColor: colors.primary,
   },
   avatarImage: {
     width: '100%',
@@ -328,19 +336,19 @@ const styles = StyleSheet.create({
   avatarPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarPlaceholderFocused: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: colors.surfaceContainerHighest,
   },
   avatarInitial: {
+    fontFamily: fontFamily.medium,
     fontSize: 12,
-    fontWeight: '500',
-    color: '#999',
+    color: colors.onSurfaceVariant,
   },
   avatarInitialFocused: {
-    color: '#000',
+    color: colors.primary,
   },
 });

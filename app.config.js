@@ -30,7 +30,9 @@ export default {
     },
     plugins: [
       "expo-notifications",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      "expo-font",
+      "expo-localization"
     ],
     extra: {
       eas: {

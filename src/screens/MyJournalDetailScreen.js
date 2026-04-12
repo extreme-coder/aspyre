@@ -17,6 +17,13 @@ import { supabase } from '../config/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../hooks/useProfile';
 import { useComments } from '../hooks/useComments';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 const GOAL_TYPE_LABELS = {
   habit: 'Habit',
@@ -253,7 +260,7 @@ export default function MyJournalDetailScreen({ route, navigation }) {
           <View style={styles.placeholder} />
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -427,7 +434,7 @@ export default function MyJournalDetailScreen({ route, navigation }) {
               value={newComment}
               onChangeText={setNewComment}
               placeholder="Add a comment..."
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
               multiline
               maxLength={500}
               editable={!addingComment}
@@ -441,7 +448,7 @@ export default function MyJournalDetailScreen({ route, navigation }) {
               disabled={!newComment.trim() || addingComment}
             >
               {addingComment ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size="small" color={colors.onPrimary} />
               ) : (
                 <Text style={styles.commentSubmitText}>Post</Text>
               )}
@@ -451,7 +458,7 @@ export default function MyJournalDetailScreen({ route, navigation }) {
           {/* Comments List */}
           {commentsLoading ? (
             <View style={styles.commentsLoading}>
-              <ActivityIndicator size="small" color="#999" />
+              <ActivityIndicator size="small" color={colors.onSurfaceVariant} />
             </View>
           ) : comments.length === 0 ? (
             <View style={styles.noComments}>
@@ -514,7 +521,7 @@ export default function MyJournalDetailScreen({ route, navigation }) {
             disabled={deleting}
           >
             {deleting ? (
-              <ActivityIndicator size="small" color="#c00" />
+              <ActivityIndicator size="small" color={colors.error} />
             ) : (
               <Text style={styles.deleteActionText}>Delete Journal</Text>
             )}
@@ -531,7 +538,7 @@ export default function MyJournalDetailScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   keyboardView: {
     flex: 1,
@@ -540,25 +547,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
   backButton: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
     minWidth: 50,
   },
   headerTitle: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   editButton: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.primary,
     minWidth: 50,
     textAlign: 'right',
   },
@@ -574,235 +581,235 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingBottom: 40,
+    paddingBottom: spacing.xl,
   },
   heroImage: {
     width: '100%',
     aspectRatio: 4 / 3,
   },
   headline: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#000',
-    padding: 24,
-    paddingBottom: 12,
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleLg.fontSize,
+    color: colors.onSurface,
+    padding: spacing.lg,
+    paddingBottom: spacing.md,
     lineHeight: 32,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    marginBottom: 12,
-    gap: 12,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    gap: spacing.md,
   },
   date: {
-    fontSize: 13,
-    fontWeight: '300',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   editedBadge: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+    backgroundColor: colors.tertiaryContainer,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.sm,
   },
   editedText: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onTertiaryContainer,
   },
   privacyRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    marginBottom: 16,
-    gap: 8,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
+    gap: spacing.sm,
   },
   privacyLabel: {
-    fontSize: 12,
-    fontWeight: '300',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   privacyValue: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurface,
   },
   goalBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8',
-    marginHorizontal: 24,
-    marginBottom: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    gap: 10,
+    backgroundColor: colors.secondaryContainer,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.lg,
+    gap: spacing.sm,
   },
   goalType: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#999',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSecondaryContainer,
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
   goalTitle: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#333',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSecondaryContainer,
   },
   section: {
-    paddingHorizontal: 24,
-    marginBottom: 24,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
   },
   sectionLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#999',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   chipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: spacing.md,
   },
   chip: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 6,
+    backgroundColor: colors.surfaceContainerHigh,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.lg,
     alignItems: 'center',
   },
   chipValue: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#000',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.titleMd.fontSize,
+    color: colors.onSurface,
   },
   chipLabel: {
-    fontSize: 11,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     marginTop: 2,
   },
   bulletsList: {
-    gap: 10,
+    gap: spacing.sm,
   },
   bulletRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   bulletDot: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#666',
-    marginRight: 10,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurfaceVariant,
+    marginRight: spacing.sm,
     marginTop: 2,
   },
   bulletText: {
     flex: 1,
-    fontSize: 15,
-    fontWeight: '300',
-    color: '#333',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     lineHeight: 22,
   },
   playbookSection: {
-    marginHorizontal: 24,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 20,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
   },
   playbookHeader: {
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   playbookTitle: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#999',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
   playbookItem: {
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   playbookLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
-    marginBottom: 6,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.xs,
   },
   playbookText: {
-    fontSize: 15,
-    fontWeight: '300',
-    color: '#333',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     lineHeight: 22,
   },
   feedbackSection: {
-    marginHorizontal: 24,
-    marginBottom: 24,
-    backgroundColor: '#f9f9f9',
-    padding: 20,
-    borderLeftWidth: 3,
-    borderLeftColor: '#ddd',
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
+    backgroundColor: colors.tertiaryContainer,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
   },
   feedbackLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#999',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onTertiaryContainer,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   feedbackQuestion: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#333',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onTertiaryContainer,
     fontStyle: 'italic',
     lineHeight: 24,
   },
   feedbackHint: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onTertiaryContainer,
   },
   statsRow: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.surfaceContainerLow,
   },
   statsText: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   actions: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    gap: 12,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    gap: spacing.md,
   },
   editActionButton: {
-    backgroundColor: '#000',
-    paddingVertical: 14,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.md,
     alignItems: 'center',
+    borderRadius: radius.xl,
   },
   editActionText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#fff',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onPrimary,
     letterSpacing: 1,
   },
   deleteActionButton: {
-    borderWidth: 1,
-    borderColor: '#c00',
-    paddingVertical: 14,
+    backgroundColor: colors.errorContainer,
+    paddingVertical: spacing.md,
     alignItems: 'center',
+    borderRadius: radius.xl,
   },
   deleteActionText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#c00',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.error,
     letterSpacing: 1,
   },
   bottomSpacer: {
@@ -810,91 +817,91 @@ const styles = StyleSheet.create({
   },
   // Comments styles
   commentsSection: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    backgroundColor: colors.surface,
   },
   commentsHeader: {
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   commentsTitle: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#999',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
   commentInputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: 12,
-    marginBottom: 24,
+    gap: spacing.md,
+    marginBottom: spacing.lg,
   },
   commentInput: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 12,
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#000',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     maxHeight: 100,
     minHeight: 44,
   },
   commentSubmitButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: radius.xl,
     minWidth: 60,
     alignItems: 'center',
   },
   commentSubmitButtonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: colors.surfaceContainerHigh,
   },
   commentSubmitText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#fff',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onPrimary,
   },
   commentsLoading: {
-    paddingVertical: 20,
+    paddingVertical: spacing.lg,
     alignItems: 'center',
   },
   noComments: {
-    paddingVertical: 20,
+    paddingVertical: spacing.lg,
     alignItems: 'center',
   },
   noCommentsText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   commentsList: {
-    gap: 20,
+    gap: spacing.lg,
   },
   commentItem: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
   },
   commentAuthorAvatar: {},
   commentAvatar: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: radius.full,
   },
   commentAvatarPlaceholder: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: '#f0f0f0',
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceContainerHigh,
     justifyContent: 'center',
     alignItems: 'center',
   },
   commentAvatarText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurfaceVariant,
   },
   commentContent: {
     flex: 1,
@@ -902,32 +909,32 @@ const styles = StyleSheet.create({
   commentHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
+    gap: spacing.sm,
+    marginBottom: spacing.xs,
   },
   commentAuthorName: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurface,
   },
   commentTime: {
-    fontSize: 11,
-    fontWeight: '300',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   commentText: {
-    fontSize: 14,
-    fontWeight: '300',
-    color: '#333',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.onSurface,
     lineHeight: 20,
   },
   commentDeleteButton: {
-    marginTop: 6,
+    marginTop: spacing.xs,
     alignSelf: 'flex-start',
   },
   commentDeleteText: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.error,
   },
 });

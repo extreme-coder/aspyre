@@ -17,6 +17,13 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../hooks/useProfile';
+import {
+  colors,
+  spacing,
+  radius,
+  typography,
+  fontFamily,
+} from '../constants/theme';
 
 /**
  * Screen for editing user profile information.
@@ -140,13 +147,13 @@ export default function EditProfileScreen({ navigation }) {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-            <Ionicons name="close" size={24} color="#666" />
+            <Ionicons name="close" size={24} color={colors.onSurfaceVariant} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Profile</Text>
           <View style={styles.headerButton} />
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -160,12 +167,12 @@ export default function EditProfileScreen({ navigation }) {
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-            <Ionicons name="close" size={24} color="#666" />
+            <Ionicons name="close" size={24} color={colors.onSurfaceVariant} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Profile</Text>
           <TouchableOpacity onPress={handleSave} disabled={saving} style={styles.headerButton}>
             {saving ? (
-              <ActivityIndicator size="small" color="#000" />
+              <ActivityIndicator size="small" color={colors.primary} />
             ) : (
               <Text style={styles.saveButton}>Save</Text>
             )}
@@ -193,7 +200,7 @@ export default function EditProfileScreen({ navigation }) {
               )}
               {uploadingAvatar && (
                 <View style={styles.avatarOverlay}>
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color={colors.onPrimary} />
                 </View>
               )}
             </TouchableOpacity>
@@ -217,7 +224,7 @@ export default function EditProfileScreen({ navigation }) {
               value={displayName}
               onChangeText={setDisplayName}
               placeholder="Your display name"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.onSurfaceVariant}
               maxLength={50}
               editable={!saving}
             />
@@ -249,7 +256,7 @@ export default function EditProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
   },
   keyboardView: {
     flex: 1,
@@ -258,23 +265,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
   headerButton: {
     width: 50,
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontFamily: fontFamily.semiBold,
+    fontSize: typography.labelMd.fontSize,
     letterSpacing: 1,
-    color: '#000',
+    color: colors.onSurface,
   },
   saveButton: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -285,31 +292,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 24,
+    padding: spacing.lg,
   },
   avatarSection: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xl,
   },
   avatar: {
     width: 100,
     height: 100,
-    borderRadius: 50,
-    backgroundColor: '#000',
+    borderRadius: radius.full,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   avatarImage: {
     width: 100,
     height: 100,
-    borderRadius: 50,
-    marginBottom: 12,
+    borderRadius: radius.full,
+    marginBottom: spacing.md,
   },
   avatarText: {
+    fontFamily: fontFamily.regular,
     fontSize: 36,
-    fontWeight: '300',
-    color: '#fff',
+    color: colors.onPrimary,
   },
   avatarOverlay: {
     position: 'absolute',
@@ -317,69 +324,69 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 12,
-    borderRadius: 50,
+    borderRadius: radius.full,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   changeAvatarText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
-    marginBottom: 8,
+    fontFamily: fontFamily.medium,
+    fontSize: typography.bodyMd.fontSize,
+    color: colors.primary,
+    marginBottom: spacing.sm,
   },
   removeAvatarText: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#999',
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
   },
   field: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   label: {
-    fontSize: 10,
-    fontWeight: '500',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelSm.fontSize,
     letterSpacing: 2,
-    color: '#999',
+    color: colors.onSurfaceVariant,
     textTransform: 'uppercase',
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 14,
-    fontSize: 16,
-    fontWeight: '300',
-    color: '#000',
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurface,
   },
   hint: {
-    fontSize: 11,
-    fontWeight: '300',
-    color: '#999',
-    marginTop: 6,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelSm.fontSize,
+    color: colors.onSurfaceVariant,
+    marginTop: spacing.xs,
   },
   readOnlyValue: {
-    fontSize: 16,
-    fontWeight: '300',
-    color: '#666',
-    paddingVertical: 14,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.bodyLg.fontSize,
+    color: colors.onSurfaceVariant,
+    paddingVertical: spacing.md,
   },
   note: {
-    backgroundColor: '#f9f9f9',
-    padding: 16,
-    borderRadius: 8,
-    marginTop: 16,
+    backgroundColor: colors.surfaceContainerLow,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    marginTop: spacing.lg,
   },
   noteText: {
-    fontSize: 13,
-    fontWeight: '300',
-    color: '#666',
-    marginBottom: 8,
+    fontFamily: fontFamily.regular,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.onSurfaceVariant,
+    marginBottom: spacing.sm,
   },
   noteLink: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#000',
+    fontFamily: fontFamily.medium,
+    fontSize: typography.labelMd.fontSize,
+    color: colors.primary,
     textDecorationLine: 'underline',
   },
 });
