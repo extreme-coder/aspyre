@@ -49,7 +49,6 @@ import SavedScreen from '../screens/SavedScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import DiscoverScreen from '../screens/DiscoverScreen';
-import DevToolsScreen from '../screens/DevToolsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -259,12 +258,6 @@ function AppStack() {
       <Stack.Screen
         name="GoalEditor"
         component={GoalEditorScreen}
-        options={{ animation: 'slide_from_right' }}
-      />
-      {/* Dev Tools - only accessible in development */}
-      <Stack.Screen
-        name="DevTools"
-        component={DevToolsScreen}
         options={{ animation: 'slide_from_right' }}
       />
     </Stack.Navigator>

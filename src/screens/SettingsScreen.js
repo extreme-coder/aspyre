@@ -528,17 +528,6 @@ export default function SettingsScreen({ navigation }) {
           <Text style={styles.logoutButtonText}>Sign Out</Text>
         </TouchableOpacity>
 
-        {/* Dev Tools - only in development */}
-        {__DEV__ && (
-          <TouchableOpacity
-            style={styles.devToolsButton}
-            onPress={() => navigation.navigate('DevTools')}
-          >
-            <Ionicons name="construct-outline" size={16} color={colors.onSurfaceVariant} />
-            <Text style={styles.devToolsButtonText}>Developer Tools</Text>
-          </TouchableOpacity>
-        )}
-
         <View style={styles.footer}>
           <Text style={styles.footerText}>Aspyre v1.0</Text>
         </View>
@@ -854,21 +843,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
   },
   unblockButtonText: {
-    fontFamily: fontFamily.medium,
-    fontSize: typography.labelMd.fontSize,
-    color: colors.onSurfaceVariant,
-  },
-  devToolsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.surfaceContainerLow,
-    paddingVertical: 14,
-    marginBottom: spacing.lg,
-    borderRadius: radius.lg,
-  },
-  devToolsButtonText: {
     fontFamily: fontFamily.medium,
     fontSize: typography.labelMd.fontSize,
     color: colors.onSurfaceVariant,

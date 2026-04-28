@@ -267,6 +267,17 @@ export default function NotificationsScreen({ navigation }) {
   if (loading && notifications.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
+        <View style={styles.actionBar}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.goBack()}
+            accessibilityLabel="Close notifications"
+            hitSlop={8}
+          >
+            <Ionicons name="close" size={24} color={colors.onSurfaceVariant} />
+          </TouchableOpacity>
+          <View style={styles.actionButton} />
+        </View>
         <View style={styles.loading}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -277,19 +288,27 @@ export default function NotificationsScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       {/* Action bar */}
-      {(unreadCount > 0 || notifications.length > 0) && (
-        <View style={styles.actionBar}>
-          {unreadCount > 0 ? (
-            <TouchableOpacity style={styles.actionButton} onPress={handleMarkAllRead}>
-              <Ionicons name="checkmark-done-outline" size={18} color={colors.onSurfaceVariant} />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.actionButton} onPress={handleClearAll}>
-              <Ionicons name="trash-outline" size={18} color={colors.onSurfaceVariant} />
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
+      <View style={styles.actionBar}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.goBack()}
+          accessibilityLabel="Close notifications"
+          hitSlop={8}
+        >
+          <Ionicons name="close" size={24} color={colors.onSurfaceVariant} />
+        </TouchableOpacity>
+        {unreadCount > 0 ? (
+          <TouchableOpacity style={styles.actionButton} onPress={handleMarkAllRead}>
+            <Ionicons name="checkmark-done-outline" size={18} color={colors.onSurfaceVariant} />
+          </TouchableOpacity>
+        ) : notifications.length > 0 ? (
+          <TouchableOpacity style={styles.actionButton} onPress={handleClearAll}>
+            <Ionicons name="trash-outline" size={18} color={colors.onSurfaceVariant} />
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.actionButton} />
+        )}
+      </View>
 
       {error ? (
         renderError()
@@ -319,7 +338,8 @@ const styles = StyleSheet.create({
   },
   actionBar: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
